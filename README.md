@@ -1,2 +1,1 @@
-# harvestapp-sdk
-Harvest: API version 2 SDK
+# Harvest API version 2 Golang SDK
