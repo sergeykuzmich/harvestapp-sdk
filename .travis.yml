@@ -1,0 +1,19 @@
+language: go
+os: linux
+go:
+- 1.13.8
+branches:
+  only:
+  - master
+install:
+- curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+- chmod +x ./cc-test-reporter
+before_script:
+- ./cc-test-reporter before-build
+script:
+- go test -coverprofile c.out
+after_script:
+- ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+env:
+  global:
+    secure: "E+2In8PjKuAgR6vamjgV66xy0SLDz+c2P3EjHdzFvNIgmI85nh9zjDGLg1OQM+qR2ny5oEV1VR5LBBoW+pa7cdUpOQhNbDjJHfqjCMEmY60MN9vGceXeehQlL9d2BX3DGpUq5CqIJDirE/JQOzCre//KvJiyEa3R9P7rh8g6K8liO92LZzOqKX4FTx0GZ4QsIh80lqFbVH5q9WVJzhVnLlKnCxzMmIP7SLV+WPxZJcxdpRdymHtlMThmjJw5ZsKkWNs+6s5HGsWplZDIU3EliIn4iXjyZHgKoK/9fp+VmqEF8eh6N5KWVr9f1/8dbapTgBu0H+rIymWgG5rq0rfJlyXo0VaUsGRdi5QvaqYxdT20jy+G0e/KyES201BRpOs0bTP70ID9keBmneo6bxL40XiEiKG/XcrVzYZuytmEUcOspcDstUDuEa5q+kLqCAGvMPl9ZbZeBkIJ3AaSSWQm6unbaxNziU0EjBks0t+Fcr5JLPxU1b2jM6IcakP4/EBP+aiA/CVdx9PEy79VCAEoX2EvTYrSeunXQAzzWbYBLPUSFNRnlhqBS7MJP6isdHcdVde+a/4GOefel096zHP04xkxbNnYdQWWPFlCx8jFpsdXuektOgIWHYRQ2sVPYaiE8alwpo2G9vLOy4rOThv6HapNH63x2lge7a+Xq/Z3bXo="
