@@ -7,13 +7,13 @@ import (
 func TestTrueOutput(t *testing.T) {
 	result := IsTrue(true)
 	if result != true {
-		t.Error("Result should be true.")
+		t.Errorf("Expected true but got '%t'", result)
 	}
 }
 
 func TestFalseOutput(t *testing.T) {
 	result := IsTrue(false)
 	if result != false {
-		t.Errorf("Expected result is false but ")
+		t.Errorf("Expected true but got '%t'", result)
 	}
 }
