@@ -1,0 +1,23 @@
+name: QA
+
+on:
+  pull_request:
+
+jobs:
+  job_tests:
+    name: Run `go test`
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        go: [ '1.14' ]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Setup Go
+      uses: actions/setup-go@v1
+      with:
+        go-version: ${{ matrix.go }}
+    - name: Execute test
+      run: go test
