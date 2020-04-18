@@ -1,4 +1,4 @@
-name: QA
+name: Pull Request QA
 
 on:
   pull_request:
