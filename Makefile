@@ -1,5 +1,8 @@
 default: coverage
 
+clean:
+	rm c.out
+
 fmt:
 	go fmt .
 
