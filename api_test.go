@@ -13,3 +13,12 @@ func TestHarvestClient(t *testing.T) {
 		t.Errorf("AccessToken expected to be TOKEN but got '%s'", harvest.AccessToken)
 	}
 }
+
+func TestInvalidJsonResponse(t *testing.T) {
+	harvest := HarvestTestClient()
+
+	_, err := harvest.GetTask(8083801, Defaults())
+	if err == nil {
+		t.Fatal("Expected invalid JSON failure")
+	}
+}
