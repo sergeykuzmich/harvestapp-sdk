@@ -27,6 +27,6 @@ jobs:
     - name: Execute tests
       run: go test -coverprofile c.out ./...
     - name: Upload CodeCoverage
-      run: GIT_BRANCH=$GITHUB_REF GIT_COMMIT_SHA=$GITHUB_SHA ./cc-test-reporter after-build --coverage-input-type gocov --exit-code $?
+      run: GIT_BRANCH=$GITHUB_REF GIT_COMMIT_SHA=$GITHUB_SHA ./cc-test-reporter after-build --coverage-input-type gocov --prefix github.com/sergeykuzmich/harvest-sdk --exit-code $?
       env:
         CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
