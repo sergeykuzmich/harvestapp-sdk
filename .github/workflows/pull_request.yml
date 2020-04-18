@@ -19,11 +19,14 @@ jobs:
       uses: actions/setup-go@v1
       with:
         go-version: ${{ matrix.go }}
-    - name: Execute test
+    - name: Prepare CodeCoverage Reporter
+      run: |
+        curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+        chmod +x ./cc-test-reporter
+        GIT_BRANCH=$GITHUB_REF GIT_COMMIT_SHA=$GITHUB_SHA ./cc-test-reporter before-build
+    - name: Execute tests
       run: go test
     - name: Upload CodeCoverage
-      uses: paambaati/codeclimate-action@v2.5.7
+      run: GIT_BRANCH=$GITHUB_REF GIT_COMMIT_SHA=$GITHUB_SHA ./cc-test-reporter after-build --exit-code $?
       env:
-        CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
-      with:
-        coverageCommand: go test -coverprofile c.out
+        CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
