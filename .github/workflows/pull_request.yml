@@ -21,3 +21,8 @@ jobs:
         go-version: ${{ matrix.go }}
     - name: Execute test
       run: go test
+    - name: Upload CodeCoverage
+      uses: paambaati/codeclimate-action@v2.5.7
+      env:
+        CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
+        coverageCommand: go test -coverprofile c.out
