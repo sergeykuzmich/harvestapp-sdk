@@ -26,10 +26,14 @@ func mockDynamicResponse() *httptest.Server {
 		filename := filepath.Join(parts...)
 
 		if _, err := os.Stat(filename); os.IsNotExist(err) {
-			http.Error(rw, fmt.Sprintf("%s doesn't exist. Create it with the mock you'd like to use.\n Args were: %s", filename, r.URL.RawQuery), http.StatusNotFound)
+			http.Error(rw, fmt.Sprintf("%s doesn't exist", filename), http.StatusNotFound)
 		}
 
 		mockData, _ := ioutil.ReadFile(filename)
 		rw.Write(mockData)
 	}))
+}
+
+func mockUnstartedServerResponse() *httptest.Server {
+	return httptest.NewUnstartedServer(http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {}))
 }

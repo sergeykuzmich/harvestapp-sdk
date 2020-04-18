@@ -24,8 +24,8 @@ func TestGetExistingTask(t *testing.T) {
 func TestGetNonExistingTask(t *testing.T) {
 	harvest := HarvestTestClient()
 
-	_, err := harvest.GetTask(8083801, Defaults())
+	_, err := harvest.GetTask(404, Defaults())
 	if err == nil {
-		t.Fatal("Not found error should be thrown")
+		t.Fatal("Expected Not Found failure")
 	}
 }

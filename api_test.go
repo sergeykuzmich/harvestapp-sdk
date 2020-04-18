@@ -22,3 +22,13 @@ func TestInvalidJsonResponse(t *testing.T) {
 		t.Fatal("Expected invalid JSON failure")
 	}
 }
+
+func TestInvalidServerResponse(t *testing.T) {
+	harvest := HarvestTestClient()
+	harvest.ApiUrl = mockUnstartedServerResponse().URL
+
+	_, err := harvest.GetTask(8083801, Defaults())
+	if err == nil {
+		t.Fatal("Expected HTTP request failure")
+	}
+}
