@@ -1,6 +1,6 @@
-default: coverage
+default: clean
 
-clean:
+clean: coverage
 	rm c.out
 
 fmt:
