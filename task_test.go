@@ -28,5 +28,34 @@ func TestGetNonExistingTask(t *testing.T) {
 	assert.Equal(t, originalError.Error(), "404")
 }
 
+func TestCreateTask(t *testing.T) {
+	harvest := HarvestTestClient()
+
+	valid_task := Task{
+		Name: "New Task Name",
 	}
+
+	task, err := harvest.CreateTask(&valid_task, Defaults())
+	assert.Nil(t, err)
+
+	assert.NotNil(t, task)
+	assert.Equal(t, "New Task Name", task.Name)
+	assert.Equal(t, 8083782, task.ID)
+}
+
+func TestCreateInvalidTask(t *testing.T) {
+	harvest := HarvestTestClient()
+
+	invalid_task := Task{
+		DefaultHourlyRate: 120.0,
+	}
+
+	args := Arguments{}
+	args["status"] = "422"
+
+	_, err := harvest.CreateTask(&invalid_task, args)
+	assert.NotNil(t, err)
+
+	originalError := errors.Unwrap(errors.Unwrap(err))
+	assert.Equal(t, originalError.Error(), "422")
 }
