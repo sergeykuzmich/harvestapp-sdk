@@ -2,30 +2,31 @@ package sdk
 
 import (
 	"testing"
+
+	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetExistingTask(t *testing.T) {
 	harvest := HarvestTestClient()
 
 	task, err := harvest.GetTask(8083800, Defaults())
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.Nil(t, err)
 
-	if task == nil {
-		t.Fatal("GetTask returned nil instead of task")
-	}
-
-	if task.Name != "Business Development" || task.ID != 8083800 {
-		t.Errorf("Incorrect was returned")
-	}
+	assert.NotNil(t, task)
+	assert.Equal(t, "Business Development", task.Name)
+	assert.Equal(t, 8083800, task.ID)
 }
 
 func TestGetNonExistingTask(t *testing.T) {
 	harvest := HarvestTestClient()
 
 	_, err := harvest.GetTask(404, Defaults())
-	if err == nil {
-		t.Fatal("Expected Not Found failure")
+	assert.NotNil(t, err)
+
+	originalError := errors.Unwrap(errors.Unwrap(err))
+	assert.Equal(t, originalError.Error(), "404")
+}
+
 	}
 }

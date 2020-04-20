@@ -2,25 +2,25 @@ package sdk
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestHarvestClient(t *testing.T) {
-	harvest := Harvest("ACCOUNTID", "TOKEN")
-	if harvest.AccountId != "ACCOUNTID" {
-		t.Errorf("AccountId expected to be ACCOUNTID but got '%s'", harvest.AccountId)
-	}
-	if harvest.AccessToken != "TOKEN" {
-		t.Errorf("AccessToken expected to be TOKEN but got '%s'", harvest.AccessToken)
-	}
+	AccountId := "ACCOUNTID"
+	Token := "TOKEN"
+
+	harvest := Harvest(AccountId, Token)
+
+	assert.Equal(t, AccountId, harvest.AccountId)
+	assert.Equal(t, Token, harvest.AccessToken)
 }
 
 func TestInvalidJsonResponse(t *testing.T) {
 	harvest := HarvestTestClient()
 
 	_, err := harvest.GetTask(8083801, Defaults())
-	if err == nil {
-		t.Fatal("Expected invalid JSON failure")
-	}
+	assert.NotNil(t, err)
 }
 
 func TestInvalidServerResponse(t *testing.T) {
@@ -28,7 +28,5 @@ func TestInvalidServerResponse(t *testing.T) {
 	harvest.ApiUrl = mockUnstartedServerResponse().URL
 
 	_, err := harvest.GetTask(8083801, Defaults())
-	if err == nil {
-		t.Fatal("Expected HTTP request failure")
-	}
+	assert.NotNil(t, err)
 }
