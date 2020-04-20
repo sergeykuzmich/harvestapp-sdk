@@ -22,3 +22,9 @@ func (a *API) GetTask(taskID int64, args Arguments) (task *Task, err error) {
 	err = a.Get(path, args, task)
 	return task, err
 }
+
+func (a *API) CreateTask(t *Task, args Arguments) (task *Task, err error) {
+	task = &Task{}
+	err = a.Post("/tasks", args, t, task)
+	return task, err
+}
