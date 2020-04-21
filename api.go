@@ -40,38 +40,7 @@ func (a *API) _addHeaders(req *http.Request) {
 	req.Header.Set("Authorization", "Bearer "+a.AccessToken)
 }
 
-func (a *API) Get(path string, args Arguments, target interface{}) error {
-	url := fmt.Sprintf("%s%s", a.ApiUrl, path)
-	urlWithParams := fmt.Sprintf("%s?%s", url, args.ToURLValues().Encode())
-
-	req, _ := http.NewRequest("GET", urlWithParams, nil)
-	a._addHeaders(req)
-
-	res, err := a.Client.Do(req)
-	if err != nil {
-		return errors.Wrapf(err, "HTTP request failure on %s", url)
-	}
-
-	defer res.Body.Close()
-
-	if res.StatusCode != 200 {
-		var body []byte
-		body, _ = ioutil.ReadAll(res.Body)
-		err := errors.New(strconv.Itoa(res.StatusCode))
-		return errors.Wrapf(err, "HTTP request failure on %s: %s", url, string(body))
-	}
-
-	decoder := json.NewDecoder(res.Body)
-	err = decoder.Decode(target)
-	if err != nil {
-		body, _ := ioutil.ReadAll(res.Body)
-		return errors.Wrapf(err, "JSON decode failed on %s: %s", url, string(body))
-	}
-
-	return nil
-}
-
-func (a *API) Post(path string, args Arguments, postData interface{}, target interface{}) error {
+func (a *API) _makeRequest(method string, path string, args Arguments, postData interface{}, target interface{}) error {
 	url := fmt.Sprintf("%s%s", a.ApiUrl, path)
 	urlWithParams := fmt.Sprintf("%s?%s", url, args.ToURLValues().Encode())
 
@@ -80,7 +49,7 @@ func (a *API) Post(path string, args Arguments, postData interface{}, target int
 		json.NewEncoder(buffer).Encode(postData)
 	}
 
-	req, _ := http.NewRequest("POST", urlWithParams, buffer)
+	req, _ := http.NewRequest(method, urlWithParams, buffer)
 	a._addHeaders(req)
 
 	res, err := a.Client.Do(req)
@@ -103,4 +72,12 @@ func (a *API) Post(path string, args Arguments, postData interface{}, target int
 	}
 
 	return nil
+}
+
+func (a *API) Get(path string, args Arguments, target interface{}) error {
+	return a._makeRequest("GET", path, args, nil, target)
+}
+
+func (a *API) Post(path string, args Arguments, postData interface{}, target interface{}) error {
+	return a._makeRequest("POST", path, args, postData, target)
 }
