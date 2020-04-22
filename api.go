@@ -40,7 +40,7 @@ func (a *API) _addHeaders(req *http.Request) {
 	req.Header.Set("Authorization", "Bearer "+a.AccessToken)
 }
 
-func (a *API) _makeRequest(method string, path string, args Arguments, postData interface{}, target interface{}) error {
+func (a *API) _makeRequest(method string, path string, args Arguments, postData interface{}) ([]byte, error) {
 	url := fmt.Sprintf("%s%s", a.ApiUrl, path)
 	urlWithParams := fmt.Sprintf("%s?%s", url, args.ToURLValues().Encode())
 
@@ -52,32 +52,47 @@ func (a *API) _makeRequest(method string, path string, args Arguments, postData 
 	req, _ := http.NewRequest(method, urlWithParams, buffer)
 	a._addHeaders(req)
 
+	var body []byte
+
 	res, err := a.Client.Do(req)
 	if err != nil {
-		return errors.Wrapf(err, "HTTP request failure on %s", url)
-	}
-	defer res.Body.Close()
-	if res.StatusCode < 200 || res.StatusCode > 299 {
-		var body []byte
-		body, _ = ioutil.ReadAll(res.Body)
-		err := errors.New(strconv.Itoa(res.StatusCode))
-		return errors.Wrapf(err, "HTTP request failure on %s: %s", url, string(body))
+		return body, errors.Wrapf(err, "HTTP request failure on %s", url)
 	}
 
-	decoder := json.NewDecoder(res.Body)
-	err = decoder.Decode(target)
+	defer res.Body.Close()
+
+
+	if res.StatusCode < 200 || res.StatusCode > 299 {
+		body, _ = ioutil.ReadAll(res.Body)
+		err := errors.New(strconv.Itoa(res.StatusCode))
+		return body, errors.Wrapf(err, "HTTP request failure on %s: %s", url, string(body))
+	}
+
+	body, err = ioutil.ReadAll(res.Body)
+	return body, err
+}
+
+func (a *API) _decodeBody(jsonBody []byte, target interface{}) error {
+	err := json.Unmarshal(jsonBody, target)
 	if err != nil {
-		body, _ := ioutil.ReadAll(res.Body)
-		return errors.Wrapf(err, "JSON decode failed on POST to %s: %s", url, string(body))
+		return errors.Wrapf(err, "JSON decode failed: %s", string(jsonBody))
 	}
 
 	return nil
 }
 
 func (a *API) Get(path string, args Arguments, target interface{}) error {
-	return a._makeRequest("GET", path, args, nil, target)
+	res, err := a._makeRequest("GET", path, args, nil)
+	if err != nil {
+		return err
+	}
+	return a._decodeBody(res, target)
 }
 
 func (a *API) Post(path string, args Arguments, postData interface{}, target interface{}) error {
-	return a._makeRequest("POST", path, args, postData, target)
+	res, err := a._makeRequest("POST", path, args, postData)
+	if err != nil {
+		return err
+	}
+	return a._decodeBody(res, target)
 }
