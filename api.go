@@ -35,9 +35,9 @@ func Harvest(accountId string, accessToken string) *API {
 func (a *API) addHeaders(req *http.Request) {
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
-	req.Header.Set("User-Agent", "github.com/sergeykuzmich/harvest-sdk v" + CLIENT_VERSION)
+	req.Header.Set("User-Agent", "github.com/sergeykuzmich/harvest-sdk v"+CLIENT_VERSION)
 	req.Header.Set("Harvest-Account-Id", a.AccountId)
-	req.Header.Set("Authorization", "Bearer " + a.AccessToken)
+	req.Header.Set("Authorization", "Bearer "+a.AccessToken)
 }
 
 // Decode respose JSON to provided target interface
@@ -50,7 +50,7 @@ func (a *API) decodeBody(jsonBody []byte, target interface{}) error {
 	return nil
 }
 
-func (a *API) createRequest(method string, path string, args Arguments, postData interface{}) (*http.Request, error) {
+func (a *API) createRequest(method string, path string, args Arguments, postData interface{}) *http.Request {
 	url := fmt.Sprintf("%s%s", a.apiUrl, path)
 	urlWithParams := fmt.Sprintf("%s?%s", url, args.ToURLValues().Encode())
 
@@ -59,13 +59,10 @@ func (a *API) createRequest(method string, path string, args Arguments, postData
 		json.NewEncoder(buffer).Encode(postData)
 	}
 
-	req, err := http.NewRequest(method, urlWithParams, buffer)
-	if err != nil {
-		return req, err
-	}
-
+	req, _ := http.NewRequest(method, urlWithParams, buffer)
 	a.addHeaders(req)
-	return req, nil
+
+	return req
 }
 
 func (a *API) doRequest(req *http.Request, target interface{}) error {
@@ -87,19 +84,13 @@ func (a *API) doRequest(req *http.Request, target interface{}) error {
 }
 
 func (a *API) Get(path string, args Arguments, target interface{}) error {
-	req, err := a.createRequest("GET", path, args, nil)
-	if err !=nil {
-		return err
-	}
+	req := a.createRequest("GET", path, args, nil)
 
 	return a.doRequest(req, target)
 }
 
 func (a *API) Post(path string, args Arguments, postData interface{}, target interface{}) error {
-	req, err := a.createRequest("POST", path, args, postData)
-	if err !=nil {
-		return err
-	}
+	req := a.createRequest("POST", path, args, postData)
 
 	return a.doRequest(req, target)
 }
