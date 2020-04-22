@@ -61,7 +61,6 @@ func (a *API) _makeRequest(method string, path string, args Arguments, postData 
 
 	defer res.Body.Close()
 
-
 	if res.StatusCode < 200 || res.StatusCode > 299 {
 		body, _ = ioutil.ReadAll(res.Body)
 		err := errors.New(strconv.Itoa(res.StatusCode))
