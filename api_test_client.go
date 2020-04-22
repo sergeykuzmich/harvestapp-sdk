@@ -13,7 +13,7 @@ import (
 
 func HarvestTestClient() *API {
 	a := Harvest("ACCOUNTID", "TOKEN")
-	a.ApiUrl = mockDynamicResponse().URL
+	a.apiUrl = mockDynamicResponse().URL
 	return a
 }
 

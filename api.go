@@ -16,16 +16,16 @@ const HARVEST_DOMAIN = "api.harvestapp.com"
 const HARVEST_API_VERSION = "v2"
 
 type API struct {
-	Client      *http.Client
-	ApiUrl      string
+	client      *http.Client
+	apiUrl      string
 	AccountId   string
 	AccessToken string
 }
 
 func Harvest(accountId string, accessToken string) *API {
 	a := API{}
-	a.Client = http.DefaultClient
-	a.ApiUrl = "https://" + HARVEST_DOMAIN + "/" + HARVEST_API_VERSION
+	a.client = http.DefaultClient
+	a.apiUrl = "https://" + HARVEST_DOMAIN + "/" + HARVEST_API_VERSION
 	a.AccountId = accountId
 	a.AccessToken = accessToken
 	return &a
@@ -35,9 +35,9 @@ func Harvest(accountId string, accessToken string) *API {
 func (a *API) _addHeaders(req *http.Request) {
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
-	req.Header.Set("User-Agent", "github.com/sergeykuzmich/harvest-sdk v"+CLIENT_VERSION)
+	req.Header.Set("User-Agent", "github.com/sergeykuzmich/harvest-sdk v" + CLIENT_VERSION)
 	req.Header.Set("Harvest-Account-Id", a.AccountId)
-	req.Header.Set("Authorization", "Bearer "+a.AccessToken)
+	req.Header.Set("Authorization", "Bearer " + a.AccessToken)
 }
 
 func (a *API) _makeRequest(method string, path string, args Arguments, postData interface{}) ([]byte, error) {
