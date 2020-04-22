@@ -32,7 +32,7 @@ func Harvest(accountId string, accessToken string) *API {
 }
 
 // Applies relevant User-Agent, Accept & Authorization
-func (a *API) _addHeaders(req *http.Request) {
+func (a *API) addHeaders(req *http.Request) {
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
 	req.Header.Set("User-Agent", "github.com/sergeykuzmich/harvest-sdk v" + CLIENT_VERSION)
@@ -40,8 +40,8 @@ func (a *API) _addHeaders(req *http.Request) {
 	req.Header.Set("Authorization", "Bearer " + a.AccessToken)
 }
 
-func (a *API) _makeRequest(method string, path string, args Arguments, postData interface{}) ([]byte, error) {
-	url := fmt.Sprintf("%s%s", a.ApiUrl, path)
+func (a *API) createRequest(method string, path string, args Arguments, postData interface{}) (*http.Request, error) {
+	url := fmt.Sprintf("%s%s", a.apiUrl, path)
 	urlWithParams := fmt.Sprintf("%s?%s", url, args.ToURLValues().Encode())
 
 	buffer := new(bytes.Buffer)
@@ -49,29 +49,34 @@ func (a *API) _makeRequest(method string, path string, args Arguments, postData 
 		json.NewEncoder(buffer).Encode(postData)
 	}
 
-	req, _ := http.NewRequest(method, urlWithParams, buffer)
-	a._addHeaders(req)
-
-	var body []byte
-
-	res, err := a.Client.Do(req)
+	req, err := http.NewRequest(method, urlWithParams, buffer)
 	if err != nil {
-		return body, errors.Wrapf(err, "HTTP request failure on %s", url)
+		return req, err
+	}
+
+	a.addHeaders(req)
+	return req, nil
+}
+
+func (a *API) makeRequest(req *http.Request, target interface{}) error {
+	res, err := a.client.Do(req)
+	if err != nil {
+		return errors.Wrapf(err, "HTTP request failure on %s", req.URL.Path)
 	}
 
 	defer res.Body.Close()
 
 	if res.StatusCode < 200 || res.StatusCode > 299 {
-		body, _ = ioutil.ReadAll(res.Body)
 		err := errors.New(strconv.Itoa(res.StatusCode))
-		return body, errors.Wrapf(err, "HTTP request failure on %s: %s", url, string(body))
+		return errors.Wrapf(err, "HTTP request failure on %s", req.URL.Path)
 	}
 
-	body, err = ioutil.ReadAll(res.Body)
-	return body, err
+	body, err := ioutil.ReadAll(res.Body)
+
+	return a.decodeBody(body, target)
 }
 
-func (a *API) _decodeBody(jsonBody []byte, target interface{}) error {
+func (a *API) decodeBody(jsonBody []byte, target interface{}) error {
 	err := json.Unmarshal(jsonBody, target)
 	if err != nil {
 		return errors.Wrapf(err, "JSON decode failed: %s", string(jsonBody))
@@ -81,17 +86,19 @@ func (a *API) _decodeBody(jsonBody []byte, target interface{}) error {
 }
 
 func (a *API) Get(path string, args Arguments, target interface{}) error {
-	res, err := a._makeRequest("GET", path, args, nil)
-	if err != nil {
+	req, err := a.createRequest("GET", path, args, nil)
+	if err !=nil {
 		return err
 	}
-	return a._decodeBody(res, target)
+
+	return a.makeRequest(req, target)
 }
 
 func (a *API) Post(path string, args Arguments, postData interface{}, target interface{}) error {
-	res, err := a._makeRequest("POST", path, args, postData)
-	if err != nil {
+	req, err := a.createRequest("POST", path, args, postData)
+	if err !=nil {
 		return err
 	}
-	return a._decodeBody(res, target)
+
+	return a.makeRequest(req, target)
 }
