@@ -40,6 +40,16 @@ func (a *API) addHeaders(req *http.Request) {
 	req.Header.Set("Authorization", "Bearer " + a.AccessToken)
 }
 
+// Decode respose JSON to provided target interface
+func (a *API) decodeBody(jsonBody []byte, target interface{}) error {
+	err := json.Unmarshal(jsonBody, target)
+	if err != nil {
+		return errors.Wrapf(err, "JSON decode failed: %s", string(jsonBody))
+	}
+
+	return nil
+}
+
 func (a *API) createRequest(method string, path string, args Arguments, postData interface{}) (*http.Request, error) {
 	url := fmt.Sprintf("%s%s", a.apiUrl, path)
 	urlWithParams := fmt.Sprintf("%s?%s", url, args.ToURLValues().Encode())
@@ -58,7 +68,7 @@ func (a *API) createRequest(method string, path string, args Arguments, postData
 	return req, nil
 }
 
-func (a *API) makeRequest(req *http.Request, target interface{}) error {
+func (a *API) doRequest(req *http.Request, target interface{}) error {
 	res, err := a.client.Do(req)
 	if err != nil {
 		return errors.Wrapf(err, "HTTP request failure on %s", req.URL.Path)
@@ -76,22 +86,13 @@ func (a *API) makeRequest(req *http.Request, target interface{}) error {
 	return a.decodeBody(body, target)
 }
 
-func (a *API) decodeBody(jsonBody []byte, target interface{}) error {
-	err := json.Unmarshal(jsonBody, target)
-	if err != nil {
-		return errors.Wrapf(err, "JSON decode failed: %s", string(jsonBody))
-	}
-
-	return nil
-}
-
 func (a *API) Get(path string, args Arguments, target interface{}) error {
 	req, err := a.createRequest("GET", path, args, nil)
 	if err !=nil {
 		return err
 	}
 
-	return a.makeRequest(req, target)
+	return a.doRequest(req, target)
 }
 
 func (a *API) Post(path string, args Arguments, postData interface{}, target interface{}) error {
@@ -100,5 +101,5 @@ func (a *API) Post(path string, args Arguments, postData interface{}, target int
 		return err
 	}
 
-	return a.makeRequest(req, target)
+	return a.doRequest(req, target)
 }
