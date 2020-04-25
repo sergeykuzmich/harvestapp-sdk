@@ -9,7 +9,7 @@ type Unexpected struct {
 }
 
 func (e *Unexpected) Error() string {
-    return fmt.Sprintf("Not Found: %s", e.path)
+    return fmt.Sprintf("Unexpected Error: %d %s %s", e.status, e.path, e.body)
 }
 
 func (e *Unexpected) Details() []byte {

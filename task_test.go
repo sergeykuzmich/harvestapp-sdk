@@ -33,11 +33,11 @@ func TestGetNonExistingTask(t *testing.T) {
 func TestCreateTask(t *testing.T) {
 	harvest := HarvestTestClient()
 
-	valid_task := Task{
+	valid_task := &Task{
 		Name: "New Task Name",
 	}
 
-	task, err := harvest.CreateTask(&valid_task, Defaults())
+	task, err := harvest.CreateTask(valid_task, Defaults())
 	assert.Nil(t, err)
 
 	assert.NotNil(t, task)
@@ -48,18 +48,18 @@ func TestCreateTask(t *testing.T) {
 func TestCreateInvalidTask(t *testing.T) {
 	harvest := HarvestTestClient()
 
-	invalid_task := Task{
+	invalid_task := &Task{
 		DefaultHourlyRate: 120.0,
 	}
 
 	args := Arguments{}
 	args["status"] = "422"
 
-	_, err := harvest.CreateTask(&invalid_task, args)
+	_, err := harvest.CreateTask(invalid_task, args)
 	assert.NotNil(t, err)
 
 	// Since SDK uses own errors check correct type is returned
-	_, ok := err.(*http_errors.Unexpected)
+	_, ok := err.(*http_errors.UnprocessableEntity)
 	assert.True(t, ok)
 
 	/* There is a way to check error details:

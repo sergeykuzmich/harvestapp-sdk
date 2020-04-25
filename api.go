@@ -45,7 +45,7 @@ func (a *API) addHeaders(req *http.Request) {
 func (a *API) decodeBody(jsonBody []byte, target interface{}) error {
 	err := json.Unmarshal(jsonBody, target)
 	if err != nil {
-		return errors.Wrapf(err, "JSON decode failed: %s", string(jsonBody))
+		return errors.Wrapf(err, "JSON decode failed: `%s`", string(jsonBody))
 	}
 
 	return nil
@@ -69,7 +69,7 @@ func (a *API) createRequest(method string, path string, args Arguments, postData
 func (a *API) doRequest(req *http.Request, target interface{}) error {
 	res, err := a.client.Do(req)
 	if err != nil {
-		return errors.Wrapf(err, "HTTP request failure on %s", req.URL.Path)
+		return errors.Wrapf(err, "HTTP request failed: `%s`", req.URL.Path)
 	}
 
 	defer res.Body.Close()

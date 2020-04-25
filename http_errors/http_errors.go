@@ -22,7 +22,7 @@ func CreateFromResponse(response *http.Response) HttpError {
 	switch status := response.StatusCode; {
 		case status == 404:
 			error = createNotFound(path, body)
-		case status == 423:
+		case status == 422:
 			error = createUnprocessableEntity(path, body)
 		default:
 			error = createUnexpected(status, path, body)
