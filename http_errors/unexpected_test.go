@@ -44,4 +44,6 @@ func TestCreateFromUnexpectedResponse(t *testing.T) {
 
 	err, ok := err.(*Unexpected)
 	assert.True(t, ok)
+
+	/* TODO: Assert all fields for Unexpcedted */
 }

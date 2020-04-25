@@ -31,16 +31,19 @@ func TestCreateUnprocessableEntityError(t *testing.T) {
 }
 
 func TestCreateFromUnprocessableEntityResponse(t *testing.T) {
-	body := "{" +
-						"\"default_hourly_rate\":120.0" +
-					"}"
+	path := "/tasks"
+	req_body := "{" +
+								"\"default_hourly_rate\":120.0" +
+							"}"
+	res_body := "{" +
+								"\"message\": \"Name can't be blank\"" +
+							"}"
 
 	buffer := new(bytes.Buffer)
-	json.NewEncoder(buffer).Encode(body)
+	json.NewEncoder(buffer).Encode(req_body)
 
-	req, _ := http.NewRequest("POST", "/tasks", buffer)
+	req, _ := http.NewRequest("POST", path, buffer)
 
-	res_body, _ := ioutil.ReadFile("../_mocks/tasks-POST-422.json")
 	res := &http.Response{
 	  Status:        "422 Unprocessable Entity",
 	  StatusCode:    422,
@@ -54,4 +57,7 @@ func TestCreateFromUnprocessableEntityResponse(t *testing.T) {
 
 	err, ok := err.(*UnprocessableEntity)
 	assert.True(t, ok)
+
+	assert.Equal(t, err.Path(), path)
+	assert.Equal(t, err.Details(), []byte(res_body))
 }
