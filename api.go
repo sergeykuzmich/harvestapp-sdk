@@ -6,9 +6,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strconv"
 
 	"github.com/pkg/errors"
+
+	"github.com/sergeykuzmich/harvestapp-sdk/http_errors"
 )
 
 const CLIENT_VERSION = "1.0.0"
@@ -74,11 +75,10 @@ func (a *API) doRequest(req *http.Request, target interface{}) error {
 	defer res.Body.Close()
 
 	if res.StatusCode < 200 || res.StatusCode > 299 {
-		err := errors.New(strconv.Itoa(res.StatusCode))
-		return errors.Wrapf(err, "HTTP request failure on %s", req.URL.Path)
+		return http_errors.CreateFromResponse(res)
 	}
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, _ := ioutil.ReadAll(res.Body)
 
 	return a.decodeBody(body, target)
 }

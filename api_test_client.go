@@ -19,7 +19,7 @@ func HarvestTestClient() *API {
 
 func mockDynamicResponse() *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		parts := []string{".", "mocks"}
+		parts := []string{".", "_mocks"}
 		parts = append(parts, strings.Split(strings.TrimPrefix(r.URL.Path, "/"), "/")...)
 
 		parts[len(parts)-1] = parts[len(parts)-1] + "-" + r.Method

@@ -3,8 +3,9 @@ package sdk
 import (
 	"testing"
 
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/sergeykuzmich/harvestapp-sdk/http_errors"
 )
 
 func TestGetExistingTask(t *testing.T) {
@@ -24,8 +25,9 @@ func TestGetNonExistingTask(t *testing.T) {
 	_, err := harvest.GetTask(404, Defaults())
 	assert.NotNil(t, err)
 
-	originalError := errors.Unwrap(errors.Unwrap(err))
-	assert.Equal(t, originalError.Error(), "404")
+	// Since SDK uses own errors check correct type is returned
+	_, ok := err.(*http_errors.NotFound)
+	assert.True(t, ok)
 }
 
 func TestCreateTask(t *testing.T) {
@@ -56,6 +58,15 @@ func TestCreateInvalidTask(t *testing.T) {
 	_, err := harvest.CreateTask(&invalid_task, args)
 	assert.NotNil(t, err)
 
-	originalError := errors.Unwrap(errors.Unwrap(err))
-	assert.Equal(t, originalError.Error(), "422")
+	// Since SDK uses own errors check correct type is returned
+	_, ok := err.(*http_errors.Unexpected)
+	assert.True(t, ok)
+
+	/* There is a way to check error details:
+
+	err, ok := err.(*http_errors.UnprocessableEntity)
+	assert.True(t, ok)
+	expectedDetails = "{'message':'Name can't be blank'}"
+	assert.Equal(t, err.Details(), expectedDetails)
+	*/
 }
