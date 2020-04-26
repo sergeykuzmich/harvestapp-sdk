@@ -20,6 +20,8 @@ func CreateFromResponse(response *http.Response) HttpError {
 	var error HttpError
 
 	switch status := response.StatusCode; {
+	case status == 403:
+		error = createForbidden(path, body)
 	case status == 404:
 		error = createNotFound(path, body)
 	case status == 422:
