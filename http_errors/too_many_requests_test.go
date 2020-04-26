@@ -15,7 +15,8 @@ func TestCreateTooManyRequestError(t *testing.T) {
 	errorMessage := fmt.Sprintf("Too Many Requests: %s", path)
 	var body []byte
 
-	err := createTooManyRequests(path, body)
+	var err *TooManyRequests
+	err = createTooManyRequests(path, body)
 
 	assert.Equal(t, err.Path(), path)
 	assert.Equal(t, err.Details(), body)

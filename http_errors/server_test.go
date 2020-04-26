@@ -16,7 +16,8 @@ func TestCreateServerError(t *testing.T) {
 	body := []byte("Server error")
 	errorMessage := fmt.Sprintf("Server Error: %d %s %s", status, path, body)
 
-	err := createServerError(status, path, body)
+	var err *Server
+	err = createServerError(status, path, body)
 
 	assert.Equal(t, err.Status(), status)
 	assert.Equal(t, err.Path(), path)

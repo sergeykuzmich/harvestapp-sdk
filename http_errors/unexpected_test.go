@@ -16,7 +16,8 @@ func TestCreateUnexpectedError(t *testing.T) {
 	body := []byte("Unexpected")
 	errorMessage := fmt.Sprintf("Unexpected Error: %d %s %s", status, path, body)
 
-	err := createUnexpected(status, path, body)
+	var err *Unexpected
+	err = createUnexpected(status, path, body)
 
 	assert.Equal(t, err.Status(), status)
 	assert.Equal(t, err.Path(), path)

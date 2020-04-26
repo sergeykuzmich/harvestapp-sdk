@@ -15,7 +15,8 @@ func TestCreateForbiddenError(t *testing.T) {
 	errorMessage := fmt.Sprintf("Forbidden: %s", path)
 	var body []byte
 
-	err := createForbidden(path, body)
+	var err *Forbidden
+	err = createForbidden(path, body)
 
 	assert.Equal(t, err.Path(), path)
 	assert.Equal(t, err.Details(), body)

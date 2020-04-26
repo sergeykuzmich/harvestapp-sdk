@@ -18,7 +18,8 @@ func TestCreateUnprocessableEntityError(t *testing.T) {
 		"}"
 	errorMessage := fmt.Sprintf("Unprocessable Entity: %s %s", path, []byte(body))
 
-	err := createUnprocessableEntity(path, []byte(body))
+	var err *UnprocessableEntity
+	err = createUnprocessableEntity(path, []byte(body))
 
 	assert.Equal(t, err.Path(), path)
 	assert.Equal(t, err.Details(), []byte(body))

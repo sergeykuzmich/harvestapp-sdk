@@ -15,7 +15,8 @@ func TestCreateUnauthorizedError(t *testing.T) {
 	errorMessage := fmt.Sprintf("Unauthorized: %s", path)
 	var body []byte
 
-	err := createUnauthorized(path, body)
+	var err *Unauthorized
+	err = createUnauthorized(path, body)
 
 	assert.Equal(t, err.Path(), path)
 	assert.Equal(t, err.Details(), body)

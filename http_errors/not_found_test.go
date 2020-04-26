@@ -15,7 +15,8 @@ func TestCreateNotFoundError(t *testing.T) {
 	errorMessage := fmt.Sprintf("Not Found: %s", path)
 	var body []byte
 
-	err := createNotFound(path, body)
+	var err *NotFound
+	err = createNotFound(path, body)
 
 	assert.Equal(t, err.Path(), path)
 	assert.Equal(t, err.Details(), body)
