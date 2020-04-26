@@ -5,20 +5,20 @@ import (
 	"net/http"
 )
 
-// HttpError is an interface for errors which can be returned.
-type HttpError interface {
+// HTTPError is an interface for errors which can be returned.
+type HTTPError interface {
 	error
 	Details() []byte
 	Path() string
 }
 
 // CreateFromResponse converts http.Response with non 2** status code
-// to Error with HttpError interface.
-func CreateFromResponse(response *http.Response) HttpError {
+// to Error with HTTPError interface.
+func CreateFromResponse(response *http.Response) HTTPError {
 	body, _ := ioutil.ReadAll(response.Body)
 	path := response.Request.URL.Path
 
-	var error HttpError
+	var error HTTPError
 
 	switch status := response.StatusCode; {
 	case status == 401:
