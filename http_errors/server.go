@@ -9,7 +9,7 @@ type Server struct {
 }
 
 func (e *Server) Error() string {
-	return fmt.Sprintf("Server Error: %d %s %s", e.status, e.path, e.body)
+	return fmt.Sprintf("%d %s %s", e.status, e.path, e.body)
 }
 
 func (e *Server) Details() []byte {
@@ -27,7 +27,7 @@ func (e *Server) Path() string {
 func createServerError(status int, path string, body []byte) *Server {
 	return &Server{
 		status: status,
-		path: path,
-		body: body,
+		path:   path,
+		body:   body,
 	}
 }
