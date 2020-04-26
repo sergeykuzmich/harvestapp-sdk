@@ -12,7 +12,7 @@ import (
 )
 
 func TestCreateUnprocessableEntityError(t *testing.T) {
-	path := "/ping"
+	path := "/422"
 	body := "{" +
 		"\"default_hourly_rate\":120.0" +
 		"}"
@@ -27,7 +27,7 @@ func TestCreateUnprocessableEntityError(t *testing.T) {
 }
 
 func TestCreateFromUnprocessableEntityResponse(t *testing.T) {
-	path := "/tasks"
+	path := "/422"
 	req_body := "{" +
 		"\"default_hourly_rate\":120.0" +
 		"}"
@@ -51,9 +51,9 @@ func TestCreateFromUnprocessableEntityResponse(t *testing.T) {
 
 	err := CreateFromResponse(res)
 
-	err, ok := err.(*UnprocessableEntity)
+	asUnprocessableEntity, ok := err.(*UnprocessableEntity)
 	assert.True(t, ok)
 
-	assert.Equal(t, err.Path(), path)
-	assert.Equal(t, err.Details(), []byte(res_body))
+	assert.Equal(t, asUnprocessableEntity.Path(), path)
+	assert.Equal(t, asUnprocessableEntity.Details(), []byte(res_body))
 }

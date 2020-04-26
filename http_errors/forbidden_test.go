@@ -11,7 +11,7 @@ import (
 )
 
 func TestCreateForbiddenError(t *testing.T) {
-	path := "/tasks/403"
+	path := "/403"
 	errorMessage := fmt.Sprintf("Forbidden: %s", path)
 	var body []byte
 
@@ -24,7 +24,9 @@ func TestCreateForbiddenError(t *testing.T) {
 }
 
 func TestCreateFromForbiddenResponse(t *testing.T) {
-	path := "/tasks/403"
+	path := "/403"
+	errorMessage := fmt.Sprintf("Forbidden: %s", path)
+
 	req, _ := http.NewRequest("GET", path, nil)
 	res := &http.Response{
 		Status:        "403 Forbidden",
@@ -41,5 +43,5 @@ func TestCreateFromForbiddenResponse(t *testing.T) {
 	assert.True(t, ok)
 
 	assert.Equal(t, asForbidden.Path(), path)
-	assert.Equal(t, asForbidden.Error(), fmt.Sprintf("Forbidden: %s", path))
+	assert.Equal(t, asForbidden.Error(), errorMessage)
 }

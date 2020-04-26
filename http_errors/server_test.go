@@ -12,9 +12,9 @@ import (
 
 func TestCreateServerError(t *testing.T) {
 	status := 500
-	path := "/server-error"
-	body := []byte("Server error")
-	errorMessage := fmt.Sprintf("Server Error: %d %s %s", status, path, body)
+	path := "/500"
+	body := []byte("Internal Server Error")
+	errorMessage := fmt.Sprintf("%d %s %s", status, path, body)
 
 	var err *Server
 	err = createServerError(status, path, body)
@@ -27,9 +27,9 @@ func TestCreateServerError(t *testing.T) {
 
 func TestCreateFromServerErrordResponse(t *testing.T) {
 	status := 500
-	path := "/server-error"
-	body := "Server error"
-	errorMessage := fmt.Sprintf("Server Error: %d %s %s", status, path, body)
+	path := "/500"
+	body := "Internal Server Error"
+	errorMessage := fmt.Sprintf("%d %s %s", status, path, body)
 
 	req, _ := http.NewRequest("GET", path, nil)
 	res := &http.Response{
@@ -43,11 +43,11 @@ func TestCreateFromServerErrordResponse(t *testing.T) {
 
 	err := CreateFromResponse(res)
 
-	asServerError, ok := err.(*Server)
+	asServer, ok := err.(*Server)
 	assert.True(t, ok)
 
-	assert.Equal(t, asServerError.Status(), status)
-	assert.Equal(t, asServerError.Path(), path)
-	assert.Equal(t, asServerError.Details(), []byte(body))
-	assert.Equal(t, asServerError.Error(), errorMessage)
+	assert.Equal(t, asServer.Status(), status)
+	assert.Equal(t, asServer.Path(), path)
+	assert.Equal(t, asServer.Details(), []byte(body))
+	assert.Equal(t, asServer.Error(), errorMessage)
 }

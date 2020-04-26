@@ -10,8 +10,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCreateTooManyRequestError(t *testing.T) {
-	path := "/tasks/429"
+func TestCreateTooManyRequestsError(t *testing.T) {
+	path := "/429"
 	errorMessage := fmt.Sprintf("Too Many Requests: %s", path)
 	var body []byte
 
@@ -24,7 +24,7 @@ func TestCreateTooManyRequestError(t *testing.T) {
 }
 
 func TestCreateFromTooManyRequestsResponse(t *testing.T) {
-	path := "/tasks/429"
+	path := "/429"
 	req, _ := http.NewRequest("GET", path, nil)
 	res := &http.Response{
 		Status:        "429 Too Many Requests",
@@ -37,8 +37,8 @@ func TestCreateFromTooManyRequestsResponse(t *testing.T) {
 
 	err := CreateFromResponse(res)
 
-	err, ok := err.(*TooManyRequests)
+	asTooManyRequests, ok := err.(*TooManyRequests)
 	assert.True(t, ok)
 
-	assert.Equal(t, err.Path(), path)
+	assert.Equal(t, asTooManyRequests.Path(), path)
 }

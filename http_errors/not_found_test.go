@@ -11,7 +11,7 @@ import (
 )
 
 func TestCreateNotFoundError(t *testing.T) {
-	path := "/tasks/404"
+	path := "/404"
 	errorMessage := fmt.Sprintf("Not Found: %s", path)
 	var body []byte
 
@@ -24,7 +24,7 @@ func TestCreateNotFoundError(t *testing.T) {
 }
 
 func TestCreateFromNotFoundResponse(t *testing.T) {
-	path := "/tasks/404"
+	path := "/404"
 	req, _ := http.NewRequest("GET", path, nil)
 	res := &http.Response{
 		Status:        "404 Not Found",
@@ -37,8 +37,8 @@ func TestCreateFromNotFoundResponse(t *testing.T) {
 
 	err := CreateFromResponse(res)
 
-	err, ok := err.(*NotFound)
+	asNotFound, ok := err.(*NotFound)
 	assert.True(t, ok)
 
-	assert.Equal(t, err.Path(), path)
+	assert.Equal(t, asNotFound.Path(), path)
 }

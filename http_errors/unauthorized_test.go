@@ -11,7 +11,7 @@ import (
 )
 
 func TestCreateUnauthorizedError(t *testing.T) {
-	path := "/tasks/401"
+	path := "/401"
 	errorMessage := fmt.Sprintf("Unauthorized: %s", path)
 	var body []byte
 
@@ -24,7 +24,9 @@ func TestCreateUnauthorizedError(t *testing.T) {
 }
 
 func TestCreateFromUnauthorizedResponse(t *testing.T) {
-	path := "/tasks/401"
+	path := "/401"
+	errorMessage := fmt.Sprintf("Unauthorized: %s", path)
+
 	req, _ := http.NewRequest("GET", path, nil)
 	res := &http.Response{
 		Status:        "401 Unauthorized",
@@ -41,5 +43,5 @@ func TestCreateFromUnauthorizedResponse(t *testing.T) {
 	assert.True(t, ok)
 
 	assert.Equal(t, asUnauthorized.Path(), path)
-	assert.Equal(t, asUnauthorized.Error(), fmt.Sprintf("Unauthorized: %s", path))
+	assert.Equal(t, asUnauthorized.Error(), errorMessage)
 }

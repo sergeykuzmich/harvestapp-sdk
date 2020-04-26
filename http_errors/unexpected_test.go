@@ -12,7 +12,7 @@ import (
 
 func TestCreateUnexpectedError(t *testing.T) {
 	status := 418
-	path := "/ping"
+	path := "/418"
 	body := []byte("Unexpected")
 	errorMessage := fmt.Sprintf("Unexpected Error: %d %s %s", status, path, body)
 
@@ -28,7 +28,7 @@ func TestCreateUnexpectedError(t *testing.T) {
 func TestCreateFromUnexpectedResponse(t *testing.T) {
 
 	status := 418
-	path := "/unexpected"
+	path := "/418"
 	body := "Unexpected"
 	errorMessage := fmt.Sprintf("Unexpected Error: %d %s %s", status, path, body)
 
