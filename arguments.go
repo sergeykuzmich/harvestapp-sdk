@@ -4,10 +4,10 @@ import (
 	"net/url"
 )
 
-// [`key` => `value`] object of items should be passed as GET arguments
+// Arguments [`key` => `value`] object of items should be passed as GET query string
 type Arguments map[string]string
 
-// Returns `empty` Arguments object
+// Defaults is just `empty` Arguments object
 func Defaults() Arguments {
 	return make(Arguments)
 }
