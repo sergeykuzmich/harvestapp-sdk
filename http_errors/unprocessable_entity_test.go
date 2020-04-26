@@ -29,10 +29,10 @@ func TestCreateUnprocessableEntityError(t *testing.T) {
 func TestCreateFromUnprocessableEntityResponse(t *testing.T) {
 	path := "/422"
 	req_body := "{" +
-		"\"default_hourly_rate\":120.0" +
+			"\"default_hourly_rate\":120.0" +
 		"}"
 	res_body := "{" +
-		"\"message\": \"Name can't be blank\"" +
+			"\"message\": \"Name can't be blank\"" +
 		"}"
 
 	buffer := new(bytes.Buffer)

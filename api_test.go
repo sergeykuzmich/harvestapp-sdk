@@ -6,27 +6,27 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestHarvestClient(t *testing.T) {
+func TestHrvstClientArguments(t *testing.T) {
 	AccountID := "ACCOUNTID"
 	AccessToken := "TOKEN"
 
-	harvest := Harvest(AccountID, AccessToken)
+	client := Client(AccountID, AccessToken)
 
-	assert.Equal(t, AccountID, harvest.AccountID)
-	assert.Equal(t, AccessToken, harvest.AccessToken)
+	assert.Equal(t, AccountID, client.AccountID)
+	assert.Equal(t, AccessToken, client.AccessToken)
 }
 
 func TestInvalidJsonResponse(t *testing.T) {
-	harvest := harvestTestClient()
+	client := testClient()
 
-	_, err := harvest.GetTask(8083801, Defaults())
+	_, err := client.GetTask(8083801, Defaults())
 	assert.NotNil(t, err)
 }
 
 func TestInvalidServerResponse(t *testing.T) {
-	harvest := harvestTestClient()
-	harvest.apiURL = mockUnstartedServerResponse().URL
+	client := testClient()
+	client.apiURL = mockUnstartedServerResponse().URL
 
-	_, err := harvest.GetTask(8083801, Defaults())
+	_, err := client.GetTask(8083801, Defaults())
 	assert.NotNil(t, err)
 }

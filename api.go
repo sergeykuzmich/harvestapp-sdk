@@ -9,13 +9,14 @@ import (
 
 	"github.com/pkg/errors"
 
-	http_errors "github.com/sergeykuzmich/harvestapp-sdk/http_errors"
+	httpErrors "github.com/sergeykuzmich/harvestapp-sdk/http_errors"
 )
 
 const clientVersion = "1.0.0"
 const harvestDomain = "api.harvestapp.com"
 const harvestAPIVersion = "v2"
 
+// Harvest API Client instance
 type API struct {
 	client      *http.Client
 	apiURL      string
@@ -23,7 +24,10 @@ type API struct {
 	AccessToken string
 }
 
-func Harvest(accountID string, accessToken string) *API {
+// Initialize Harvest API Client with auth credentials:
+//	* Account ID
+//	* Api Token.
+func Client(accountID string, accessToken string) *API {
 	a := API{}
 	a.client = http.DefaultClient
 	a.apiURL = "https://" + harvestDomain + "/" + harvestAPIVersion
@@ -32,7 +36,7 @@ func Harvest(accountID string, accessToken string) *API {
 	return &a
 }
 
-// Applies relevant User-Agent, Accept & Authorization
+// Applies relevant User-Agent, Accept & Authorization.
 func (a *API) addHeaders(req *http.Request) {
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
@@ -41,7 +45,7 @@ func (a *API) addHeaders(req *http.Request) {
 	req.Header.Set("Authorization", "Bearer "+a.AccessToken)
 }
 
-// Decode respose JSON to provided target interface
+// Decode respose JSON to provided target interface.
 func (a *API) decodeBody(jsonBody []byte, target interface{}) error {
 	err := json.Unmarshal(jsonBody, target)
 	if err != nil {
@@ -51,9 +55,10 @@ func (a *API) decodeBody(jsonBody []byte, target interface{}) error {
 	return nil
 }
 
-func (a *API) createRequest(method string, path string, args Arguments, postData interface{}) *http.Request {
+// Prepare & fill http.Request with URI, query, body & headers.
+func (a *API) createRequest(method string, path string, queryData Arguments, postData interface{}) *http.Request {
 	url := fmt.Sprintf("%s%s", a.apiURL, path)
-	urlWithParams := fmt.Sprintf("%s?%s", url, args.ToURLValues().Encode())
+	urlWithParams := fmt.Sprintf("%s?%s", url, queryData.toURLValues().Encode())
 
 	buffer := new(bytes.Buffer)
 	if postData != nil {
@@ -75,7 +80,7 @@ func (a *API) doRequest(req *http.Request, target interface{}) error {
 	defer res.Body.Close()
 
 	if res.StatusCode < 200 || res.StatusCode > 299 {
-		return http_errors.CreateFromResponse(res)
+		return httpErrors.CreateFromResponse(res)
 	}
 
 	if target != nil {
@@ -87,26 +92,43 @@ func (a *API) doRequest(req *http.Request, target interface{}) error {
 	return nil
 }
 
+// Perform GET request to Harvest API with:
+//	* path		- https://API.harvestapp.com/v2/{path}
+//	* args		- as query variables
+//	* target	- interface response should be placed to
 func (a *API) Get(path string, args Arguments, target interface{}) error {
 	req := a.createRequest("GET", path, args, nil)
 
 	return a.doRequest(req, target)
 }
 
+// Perform DELETE request to Harvest API with:
+//	* path	- https://API.harvestapp.com/v2/{path}
+//	* args	- as query variables
 func (a *API) Delete(path string, args Arguments) error {
 	req := a.createRequest("DELETE", path, args, nil)
 
 	return a.doRequest(req, nil)
 }
 
-func (a *API) Post(path string, args Arguments, postData interface{}, target interface{}) error {
-	req := a.createRequest("POST", path, args, postData)
+// Perform POST request to Harvest API with:
+//	* path		- https://API.harvestapp.com/v2/{path}
+//	* args		- as query variables
+//	* body		- as body
+//	* target	- interface response should be placed to
+func (a *API) Post(path string, args Arguments, body interface{}, target interface{}) error {
+	req := a.createRequest("POST", path, args, body)
 
 	return a.doRequest(req, target)
 }
 
-func (a *API) Patch(path string, args Arguments, postData interface{}, target interface{}) error {
-	req := a.createRequest("PATCH", path, args, postData)
+// Perform PATCH request to Harvest API with:
+//	* path		- https://API.harvestapp.com/v2/{path}
+//	* args		- as query variables
+//	* body		- as body
+//	* target	- interface response should be placed to
+func (a *API) Patch(path string, args Arguments, body interface{}, target interface{}) error {
+	req := a.createRequest("PATCH", path, args, body)
 
 	return a.doRequest(req, target)
 }

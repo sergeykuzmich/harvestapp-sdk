@@ -11,8 +11,8 @@ import (
 	"strings"
 )
 
-func harvestTestClient() *API {
-	a := Harvest("ACCOUNTID", "TOKEN")
+func testClient() *API {
+	a := Client("ACCOUNTID", "TOKEN")
 	a.apiURL = mockDynamicResponse().URL
 	return a
 }
