@@ -16,7 +16,7 @@ type Task struct {
 	UpdatedAt         time.Time `json:"updated_at"`
 }
 
-func (a *API) GetTask(taskID int64, args Arguments) (task *Task, err error) {
+func (a *API) GetTask(taskID int, args Arguments) (task *Task, err error) {
 	task = &Task{}
 	path := fmt.Sprintf("/tasks/%v", taskID)
 	err = a.Get(path, args, task)
@@ -36,7 +36,7 @@ func (a *API) UpdateTask(t *Task, args Arguments) (task *Task, err error) {
 	return task, err
 }
 
-func (a *API) DeleteTask(taskID int64, args Arguments) (err error) {
+func (a *API) DeleteTask(taskID int, args Arguments) (err error) {
 	path := fmt.Sprintf("/tasks/%v", taskID)
 	err = a.Delete(path, args)
 	return err
