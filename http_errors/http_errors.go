@@ -20,15 +20,13 @@ func CreateFromResponse(response *http.Response) HttpError {
 	var error HttpError
 
 	switch status := response.StatusCode; {
-		case status == 404:
-			error = createNotFound(path, body)
-		case status == 422:
-			error = createUnprocessableEntity(path, body)
-		default:
-			error = createUnexpected(status, path, body)
+	case status == 404:
+		error = createNotFound(path, body)
+	case status == 422:
+		error = createUnprocessableEntity(path, body)
+	default:
+		error = createUnexpected(status, path, body)
 	}
 
 	return error
 }
-
-

@@ -26,12 +26,12 @@ func TestCreateFromNotFoundResponse(t *testing.T) {
 	path := "/tasks/404"
 	req, _ := http.NewRequest("GET", path, nil)
 	res := &http.Response{
-	  Status:        "404 Not Found",
-	  StatusCode:    404,
-	  Proto:         "HTTP/1.1",
-	  Body:          ioutil.NopCloser(bytes.NewBufferString("")),
-	  ContentLength: int64(len("")),
-	  Request:       req,
+		Status:        "404 Not Found",
+		StatusCode:    404,
+		Proto:         "HTTP/1.1",
+		Body:          ioutil.NopCloser(bytes.NewBufferString("")),
+		ContentLength: int64(len("")),
+		Request:       req,
 	}
 
 	err := CreateFromResponse(res)
