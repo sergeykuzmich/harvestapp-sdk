@@ -5,7 +5,8 @@ import (
 	"time"
 )
 
-//
+// Task is a struct to represet Harvest Task.
+// > Allows to perform `struct` -> `JSON` & `JSON` -> `struct` conversion.
 type Task struct {
 	ID                int       `json:"id"`
 	Name              string    `json:"name"`
@@ -17,7 +18,7 @@ type Task struct {
 	UpdatedAt         time.Time `json:"updated_at"`
 }
 
-// GetTask returns Harvest Task with specified ID
+// GetTask returns Harvest Task with specified ID.
 func (a *API) GetTask(taskID int, args Arguments) (task *Task, err error) {
 	task = &Task{}
 	path := fmt.Sprintf("/tasks/%v", taskID)
@@ -25,15 +26,15 @@ func (a *API) GetTask(taskID int, args Arguments) (task *Task, err error) {
 	return task, err
 }
 
-// CreateTask creates Harvest Task equal *Task{} object
+// CreateTask creates Harvest Task equal *Task{} object.
 func (a *API) CreateTask(t *Task, args Arguments) (task *Task, err error) {
 	task = &Task{}
 	err = a.Post("/tasks", args, t, task)
 	return task, err
 }
 
-// UpdateTask performs Harvest Task update to match *Task{} object
-// > Task.ID is used to determine Harvest Task to update
+// UpdateTask performs Harvest Task update to match *Task{} object.
+// > Task.ID is used to determine Harvest Task to update.
 func (a *API) UpdateTask(t *Task, args Arguments) (task *Task, err error) {
 	task = &Task{}
 	path := fmt.Sprintf("/tasks/%v", t.ID)
@@ -41,7 +42,7 @@ func (a *API) UpdateTask(t *Task, args Arguments) (task *Task, err error) {
 	return task, err
 }
 
-// DeleteTask removes Harvest Task with specified ID
+// DeleteTask removes Harvest Task with specified ID.
 func (a *API) DeleteTask(taskID int, args Arguments) (err error) {
 	path := fmt.Sprintf("/tasks/%v", taskID)
 	err = a.Delete(path, args)

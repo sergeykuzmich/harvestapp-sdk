@@ -16,7 +16,7 @@ const clientVersion = "1.0.0"
 const harvestDomain = "api.harvestapp.com"
 const harvestAPIVersion = "v2"
 
-// API is main Harvest API Client instance of this SDK
+// API is main Harvest API Client instance of this SDK.
 type API struct {
 	client      *http.Client
 	apiURL      string
@@ -25,7 +25,7 @@ type API struct {
 }
 
 // Client initializes Harvest API Client with auth credentials:
-//	* Account ID
+//	* Account ID;
 //	* Api Token.
 func Client(accountID string, accessToken string) *API {
 	a := API{}
@@ -93,9 +93,9 @@ func (a *API) doRequest(req *http.Request, target interface{}) error {
 }
 
 // Get allows to perform direct GET request to Harvest API with:
-//	* path		- https://API.harvestapp.com/v2/{path}
-//	* args		- as query variables
-//	* target	- interface response should be placed to
+//	* path		- https://API.harvestapp.com/v2/{path};
+//	* args		- as query variables;
+//	* target	- interface response should be placed to.
 func (a *API) Get(path string, args Arguments, target interface{}) error {
 	req := a.createRequest("GET", path, args, nil)
 
@@ -103,8 +103,8 @@ func (a *API) Get(path string, args Arguments, target interface{}) error {
 }
 
 // Delete allows to perform direct DELETE request to Harvest API with:
-//	* path	- https://API.harvestapp.com/v2/{path}
-//	* args	- as query variables
+//	* path	- https://API.harvestapp.com/v2/{path};
+//	* args	- as query variables.
 func (a *API) Delete(path string, args Arguments) error {
 	req := a.createRequest("DELETE", path, args, nil)
 
@@ -112,10 +112,10 @@ func (a *API) Delete(path string, args Arguments) error {
 }
 
 // Post allows to perform direct POST request to Harvest API with:
-//	* path		- https://API.harvestapp.com/v2/{path}
-//	* args		- as query variables
-//	* body		- as body
-//	* target	- interface response should be placed to
+//	* path		- https://API.harvestapp.com/v2/{path};
+//	* args		- as query variables;
+//	* body		- as body;
+//	* target	- interface response should be placed to.
 func (a *API) Post(path string, args Arguments, body interface{}, target interface{}) error {
 	req := a.createRequest("POST", path, args, body)
 
@@ -123,10 +123,10 @@ func (a *API) Post(path string, args Arguments, body interface{}, target interfa
 }
 
 // Patch allows to perform direct PATCH request to Harvest API with:
-//	* path		- https://API.harvestapp.com/v2/{path}
-//	* args		- as query variables
-//	* body		- as body
-//	* target	- interface response should be placed to
+//	* path		- https://API.harvestapp.com/v2/{path};
+//	* args		- as query variables;
+//	* body		- as body;
+//	* target	- interface response should be placed to.
 func (a *API) Patch(path string, args Arguments, body interface{}, target interface{}) error {
 	req := a.createRequest("PATCH", path, args, body)
 
