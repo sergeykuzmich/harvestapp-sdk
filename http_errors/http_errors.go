@@ -5,17 +5,17 @@ import (
 	"net/http"
 )
 
-type httpError interface {
+type HttpError interface {
 	error
 	Details() []byte
 	Path() string
 }
 
-func CreateFromResponse(response *http.Response) httpError {
+func CreateFromResponse(response *http.Response) HttpError {
 	body, _ := ioutil.ReadAll(response.Body)
 	path := response.Request.URL.Path
 
-	var error httpError
+	var error HttpError
 
 	switch status := response.StatusCode; {
 	case status == 401:
