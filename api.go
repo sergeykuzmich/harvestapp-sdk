@@ -78,9 +78,13 @@ func (a *API) doRequest(req *http.Request, target interface{}) error {
 		return http_errors.CreateFromResponse(res)
 	}
 
-	body, _ := ioutil.ReadAll(res.Body)
+	if target != nil {
+		body, _ := ioutil.ReadAll(res.Body)
 
-	return a.decodeBody(body, target)
+		return a.decodeBody(body, target)
+	}
+
+	return nil
 }
 
 func (a *API) Get(path string, args Arguments, target interface{}) error {
@@ -89,8 +93,20 @@ func (a *API) Get(path string, args Arguments, target interface{}) error {
 	return a.doRequest(req, target)
 }
 
+func (a *API) Delete(path string, args Arguments) error {
+	req := a.createRequest("DELETE", path, args, nil)
+
+	return a.doRequest(req, nil)
+}
+
 func (a *API) Post(path string, args Arguments, postData interface{}, target interface{}) error {
 	req := a.createRequest("POST", path, args, postData)
+
+	return a.doRequest(req, target)
+}
+
+func (a *API) Patch(path string, args Arguments, postData interface{}, target interface{}) error {
+	req := a.createRequest("PATCH", path, args, postData)
 
 	return a.doRequest(req, target)
 }
