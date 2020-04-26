@@ -14,7 +14,7 @@ import (
 
 const clientVersion = "1.0.0"
 const harvestDomain = "api.harvestapp.com"
-const harvestApiVersion = "v2"
+const harvestAPIVersion = "v2"
 
 type API struct {
 	client      *http.Client
@@ -23,11 +23,11 @@ type API struct {
 	AccessToken string
 }
 
-func Harvest(accountId string, accessToken string) *API {
+func Harvest(accountID string, accessToken string) *API {
 	a := API{}
 	a.client = http.DefaultClient
-	a.apiURL = "https://" + harvestDomain + "/" + harvestApiVersion
-	a.AccountID = accountId
+	a.apiURL = "https://" + harvestDomain + "/" + harvestAPIVersion
+	a.AccountID = accountID
 	a.AccessToken = accessToken
 	return &a
 }
