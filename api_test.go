@@ -17,14 +17,14 @@ func TestHarvestClient(t *testing.T) {
 }
 
 func TestInvalidJsonResponse(t *testing.T) {
-	harvest := HarvestTestClient()
+	harvest := harvestTestClient()
 
 	_, err := harvest.GetTask(8083801, Defaults())
 	assert.NotNil(t, err)
 }
 
 func TestInvalidServerResponse(t *testing.T) {
-	harvest := HarvestTestClient()
+	harvest := harvestTestClient()
 	harvest.apiURL = mockUnstartedServerResponse().URL
 
 	_, err := harvest.GetTask(8083801, Defaults())

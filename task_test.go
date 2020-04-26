@@ -9,7 +9,7 @@ import (
 )
 
 func TestGetExistingTask(t *testing.T) {
-	harvest := HarvestTestClient()
+	harvest := harvestTestClient()
 
 	task, err := harvest.GetTask(8083800, Defaults())
 	assert.Nil(t, err)
@@ -20,7 +20,7 @@ func TestGetExistingTask(t *testing.T) {
 }
 
 func TestGetNonExistingTask(t *testing.T) {
-	harvest := HarvestTestClient()
+	harvest := harvestTestClient()
 
 	_, err := harvest.GetTask(404, Defaults())
 	assert.NotNil(t, err)
@@ -31,7 +31,7 @@ func TestGetNonExistingTask(t *testing.T) {
 }
 
 func TestCreateTask(t *testing.T) {
-	harvest := HarvestTestClient()
+	harvest := harvestTestClient()
 
 	valid_task := &Task{
 		Name: "New Task Name",
@@ -46,7 +46,7 @@ func TestCreateTask(t *testing.T) {
 }
 
 func TestCreateInvalidTask(t *testing.T) {
-	harvest := HarvestTestClient()
+	harvest := harvestTestClient()
 
 	invalid_task := &Task{
 		DefaultHourlyRate: 120.0,
@@ -72,7 +72,7 @@ func TestCreateInvalidTask(t *testing.T) {
 }
 
 func TestUpdateTaskWithValidInput(t *testing.T) {
-	harvest := HarvestTestClient()
+	harvest := harvestTestClient()
 
 	valid_task := &Task{
 		ID:                8083782,
@@ -88,7 +88,7 @@ func TestUpdateTaskWithValidInput(t *testing.T) {
 }
 
 func TestUpdateTaskWithInvalidInput(t *testing.T) {
-	harvest := HarvestTestClient()
+	harvest := harvestTestClient()
 
 	invalid_task := &Task{
 		ID:   8083783,
@@ -107,7 +107,7 @@ func TestUpdateTaskWithInvalidInput(t *testing.T) {
 }
 
 func TestUpdateNonExistingTask(t *testing.T) {
-	harvest := HarvestTestClient()
+	harvest := harvestTestClient()
 
 	task := &Task{
 		ID:   404,
@@ -123,14 +123,14 @@ func TestUpdateNonExistingTask(t *testing.T) {
 }
 
 func TestDeleteTask(t *testing.T) {
-	harvest := HarvestTestClient()
+	harvest := harvestTestClient()
 
 	err := harvest.DeleteTask(8083782, Defaults())
 	assert.Nil(t, err)
 }
 
 func TestDeleteNonExistingTask(t *testing.T) {
-	harvest := HarvestTestClient()
+	harvest := harvestTestClient()
 
 	err := harvest.DeleteTask(404, Defaults())
 	assert.NotNil(t, err)
