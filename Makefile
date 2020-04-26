@@ -1,13 +1,13 @@
-default: clean
+default: fmt test coverage clean
 
-clean: coverage
+clean:
 	rm c.out
 
 fmt:
-	go fmt .
+	go fmt ./...
 
-test: fmt
-	go test -coverprofile=c.out
+test:
+	go test ./... -coverprofile=c.out
 
 coverage: test
 	go tool cover -html=c.out

@@ -1,12 +1,15 @@
 package sdk
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 
 	"github.com/pkg/errors"
+
+	"github.com/sergeykuzmich/harvestapp-sdk/http_errors"
 )
 
 const CLIENT_VERSION = "1.0.0"
@@ -14,55 +17,96 @@ const HARVEST_DOMAIN = "api.harvestapp.com"
 const HARVEST_API_VERSION = "v2"
 
 type API struct {
-	Client      *http.Client
-	ApiUrl      string
+	client      *http.Client
+	apiUrl      string
 	AccountId   string
 	AccessToken string
 }
 
 func Harvest(accountId string, accessToken string) *API {
 	a := API{}
-	a.Client = http.DefaultClient
-	a.ApiUrl = "https://" + HARVEST_DOMAIN + "/" + HARVEST_API_VERSION
+	a.client = http.DefaultClient
+	a.apiUrl = "https://" + HARVEST_DOMAIN + "/" + HARVEST_API_VERSION
 	a.AccountId = accountId
 	a.AccessToken = accessToken
 	return &a
 }
 
-func (a *API) Get(path string, args Arguments, target interface{}) error {
-	url := fmt.Sprintf("%s%s", a.ApiUrl, path)
-	urlWithParams := fmt.Sprintf("%s?%s", url, args.ToURLValues().Encode())
+// Applies relevant User-Agent, Accept & Authorization
+func (a *API) addHeaders(req *http.Request) {
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Content-Type", "application/json; charset=utf-8")
+	req.Header.Set("User-Agent", "github.com/sergeykuzmich/harvest-sdk v"+CLIENT_VERSION)
+	req.Header.Set("Harvest-Account-Id", a.AccountId)
+	req.Header.Set("Authorization", "Bearer "+a.AccessToken)
+}
 
-	req, _ := http.NewRequest("GET", urlWithParams, nil)
-	a._addHeaders(req)
-
-	res, err := a.Client.Do(req)
+// Decode respose JSON to provided target interface
+func (a *API) decodeBody(jsonBody []byte, target interface{}) error {
+	err := json.Unmarshal(jsonBody, target)
 	if err != nil {
-		return errors.Wrapf(err, "HTTP request failure on %s", url)
-	}
-
-	defer res.Body.Close()
-
-	if res.StatusCode != 200 {
-		var body []byte
-		body, _ = ioutil.ReadAll(res.Body)
-		return errors.Errorf("HTTP request failure on %s: %s", url, string(body))
-	}
-
-	decoder := json.NewDecoder(res.Body)
-	err = decoder.Decode(target)
-	if err != nil {
-		body, _ := ioutil.ReadAll(res.Body)
-		return errors.Wrapf(err, "JSON decode failed on %s: %s", url, string(body))
+		return errors.Wrapf(err, "JSON decode failed: `%s`", string(jsonBody))
 	}
 
 	return nil
 }
 
-// Applies relevant User-Agent, Accept & Authorization
-func (a *API) _addHeaders(req *http.Request) {
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("User-Agent", "github.com/sergeykuzmich/harvest-sdk v"+CLIENT_VERSION)
-	req.Header.Set("Harvest-Account-Id", a.AccountId)
-	req.Header.Set("Authorization", "Bearer "+a.AccessToken)
+func (a *API) createRequest(method string, path string, args Arguments, postData interface{}) *http.Request {
+	url := fmt.Sprintf("%s%s", a.apiUrl, path)
+	urlWithParams := fmt.Sprintf("%s?%s", url, args.ToURLValues().Encode())
+
+	buffer := new(bytes.Buffer)
+	if postData != nil {
+		json.NewEncoder(buffer).Encode(postData)
+	}
+
+	req, _ := http.NewRequest(method, urlWithParams, buffer)
+	a.addHeaders(req)
+
+	return req
+}
+
+func (a *API) doRequest(req *http.Request, target interface{}) error {
+	res, err := a.client.Do(req)
+	if err != nil {
+		return errors.Wrapf(err, "HTTP request failed: `%s`", req.URL.Path)
+	}
+
+	defer res.Body.Close()
+
+	if res.StatusCode < 200 || res.StatusCode > 299 {
+		return http_errors.CreateFromResponse(res)
+	}
+
+	if target != nil {
+		body, _ := ioutil.ReadAll(res.Body)
+
+		return a.decodeBody(body, target)
+	}
+
+	return nil
+}
+
+func (a *API) Get(path string, args Arguments, target interface{}) error {
+	req := a.createRequest("GET", path, args, nil)
+
+	return a.doRequest(req, target)
+}
+
+func (a *API) Delete(path string, args Arguments) error {
+	req := a.createRequest("DELETE", path, args, nil)
+
+	return a.doRequest(req, nil)
+}
+
+func (a *API) Post(path string, args Arguments, postData interface{}, target interface{}) error {
+	req := a.createRequest("POST", path, args, postData)
+
+	return a.doRequest(req, target)
+}
+
+func (a *API) Patch(path string, args Arguments, postData interface{}, target interface{}) error {
+	req := a.createRequest("PATCH", path, args, postData)
+
+	return a.doRequest(req, target)
 }

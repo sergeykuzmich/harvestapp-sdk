@@ -7,22 +7,32 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
 
 func HarvestTestClient() *API {
 	a := Harvest("ACCOUNTID", "TOKEN")
-	a.ApiUrl = mockDynamicResponse().URL
+	a.apiUrl = mockDynamicResponse().URL
 	return a
 }
 
 func mockDynamicResponse() *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-
-		parts := []string{".", "mocks"}
+		parts := []string{".", "_mocks"}
 		parts = append(parts, strings.Split(strings.TrimPrefix(r.URL.Path, "/"), "/")...)
 
-		parts[len(parts)-1] = parts[len(parts)-1] + "-" + r.Method + ".json"
+		parts[len(parts)-1] = parts[len(parts)-1] + "-" + r.Method
+
+		customStatus := strings.Join(r.URL.Query()["status"], "")
+		if customStatus != "" {
+			parts[len(parts)-1] = parts[len(parts)-1] + "-" + customStatus
+
+			responseStatus, _ := strconv.Atoi(customStatus)
+			rw.WriteHeader(responseStatus)
+		}
+
+		parts[len(parts)-1] = parts[len(parts)-1] + ".json"
 		filename := filepath.Join(parts...)
 
 		if _, err := os.Stat(filename); os.IsNotExist(err) {
