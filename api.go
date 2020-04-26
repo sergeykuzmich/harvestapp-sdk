@@ -12,22 +12,22 @@ import (
 	"github.com/sergeykuzmich/harvestapp-sdk/http_errors"
 )
 
-const CLIENT_VERSION = "1.0.0"
-const HARVEST_DOMAIN = "api.harvestapp.com"
-const HARVEST_API_VERSION = "v2"
+const clientVersion = "1.0.0"
+const harvestDomain = "api.harvestapp.com"
+const harvestApiVersion = "v2"
 
 type API struct {
 	client      *http.Client
-	apiUrl      string
-	AccountId   string
+	apiURL      string
+	AccountID   string
 	AccessToken string
 }
 
 func Harvest(accountId string, accessToken string) *API {
 	a := API{}
 	a.client = http.DefaultClient
-	a.apiUrl = "https://" + HARVEST_DOMAIN + "/" + HARVEST_API_VERSION
-	a.AccountId = accountId
+	a.apiURL = "https://" + harvestDomain + "/" + harvestApiVersion
+	a.AccountID = accountId
 	a.AccessToken = accessToken
 	return &a
 }
@@ -36,8 +36,8 @@ func Harvest(accountId string, accessToken string) *API {
 func (a *API) addHeaders(req *http.Request) {
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
-	req.Header.Set("User-Agent", "github.com/sergeykuzmich/harvest-sdk v"+CLIENT_VERSION)
-	req.Header.Set("Harvest-Account-Id", a.AccountId)
+	req.Header.Set("User-Agent", "github.com/sergeykuzmich/harvest-sdk v"+clientVersion)
+	req.Header.Set("Harvest-Account-Id", a.AccountID)
 	req.Header.Set("Authorization", "Bearer "+a.AccessToken)
 }
 
@@ -52,7 +52,7 @@ func (a *API) decodeBody(jsonBody []byte, target interface{}) error {
 }
 
 func (a *API) createRequest(method string, path string, args Arguments, postData interface{}) *http.Request {
-	url := fmt.Sprintf("%s%s", a.apiUrl, path)
+	url := fmt.Sprintf("%s%s", a.apiURL, path)
 	urlWithParams := fmt.Sprintf("%s?%s", url, args.ToURLValues().Encode())
 
 	buffer := new(bytes.Buffer)
