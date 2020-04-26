@@ -1,4 +1,4 @@
-package sdk
+package hrvst
 
 import (
 	"bytes"
@@ -9,7 +9,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/sergeykuzmich/harvestapp-sdk/http_errors"
+	http_errors "github.com/sergeykuzmich/harvestapp-sdk/http_errors"
 )
 
 const clientVersion = "1.0.0"

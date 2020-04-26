@@ -1,11 +1,11 @@
-package sdk
+package hrvst
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/sergeykuzmich/harvestapp-sdk/http_errors"
+	http_errors "github.com/sergeykuzmich/harvestapp-sdk/http_errors"
 )
 
 func TestGetExistingTask(t *testing.T) {
