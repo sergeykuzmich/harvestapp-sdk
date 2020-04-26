@@ -25,20 +25,29 @@ func TestCreateUnexpectedError(t *testing.T) {
 }
 
 func TestCreateFromUnexpectedResponse(t *testing.T) {
-	req, _ := http.NewRequest("GET", "/unexpected", nil)
+
+	status := 418
+	path := "/unexpected"
+	body := "Unexpected"
+	errorMessage := fmt.Sprintf("Unexpected Error: %d %s %s", status, path, body)
+
+	req, _ := http.NewRequest("GET", path, nil)
 	res := &http.Response{
-	  Status:        "418 I'm a teapot",
-	  StatusCode:    418,
-	  Proto:         "HTTP/1.1",
-	  Body:          ioutil.NopCloser(bytes.NewBufferString("")),
-	  ContentLength: int64(len("")),
-	  Request:       req,
+		Status:        "418 I'm a teapot",
+		StatusCode:    status,
+		Proto:         "HTTP/1.1",
+		Body:          ioutil.NopCloser(bytes.NewBufferString(body)),
+		ContentLength: int64(len("")),
+		Request:       req,
 	}
 
 	err := CreateFromResponse(res)
 
-	err, ok := err.(*Unexpected)
+	asUnexpected, ok := err.(*Unexpected)
 	assert.True(t, ok)
 
-	/* TODO: Assert all fields for Unexpcedted */
+	assert.Equal(t, asUnexpected.Status(), status)
+	assert.Equal(t, asUnexpected.Path(), path)
+	assert.Equal(t, asUnexpected.Details(), []byte(body))
+	assert.Equal(t, asUnexpected.Error(), errorMessage)
 }
