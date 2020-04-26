@@ -28,6 +28,8 @@ func CreateFromResponse(response *http.Response) HttpError {
 		error = createNotFound(path, body)
 	case status == 422:
 		error = createUnprocessableEntity(path, body)
+	case status == 429:
+		error = createTooManyRequests(path, body)
 	case status >= 500:
 		error = createServerError(status, path, body)
 	default:
