@@ -16,17 +16,12 @@ func TestCreateUnexpectedError(t *testing.T) {
 	body := []byte("Unexpected")
 	errorMessage := fmt.Sprintf("Unexpected Error: %d %s %s", status, path, body)
 
+	err := createUnexpected(status, path, body)
 
-	var err HttpError
-	err = createUnexpected(status, path, body)
-
-	converted_err, ok := err.(*Unexpected)
-	assert.True(t, ok)
-
-	assert.Equal(t, converted_err.Status(), status)
-	assert.Equal(t, converted_err.Path(), path)
-	assert.Equal(t, converted_err.Details(), body)
-	assert.Equal(t, converted_err.Error(), errorMessage)
+	assert.Equal(t, err.Status(), status)
+	assert.Equal(t, err.Path(), path)
+	assert.Equal(t, err.Details(), body)
+	assert.Equal(t, err.Error(), errorMessage)
 }
 
 func TestCreateFromUnexpectedResponse(t *testing.T) {

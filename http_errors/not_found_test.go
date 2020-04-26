@@ -15,12 +15,7 @@ func TestCreateNotFoundError(t *testing.T) {
 	errorMessage := fmt.Sprintf("Not Found: %s", path)
 	var body []byte
 
-
-	var err HttpError
-	err = createNotFound(path, body)
-
-	err, ok := err.(*NotFound)
-	assert.True(t, ok)
+	err := createNotFound(path, body)
 
 	assert.Equal(t, err.Path(), path)
 	assert.Equal(t, err.Details(), body)
