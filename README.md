@@ -6,3 +6,5 @@
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/sergeykuzmich/harvestapp-sdk)
 ![GitHub last commit](https://img.shields.io/github/last-commit/sergeykuzmich/harvestapp-sdk)
 ![GitHub contributors](https://img.shields.io/github/contributors/sergeykuzmich/harvestapp-sdk)
+
+Go Package Docs: [pkg.go.dev/github.com/sergeykuzmich/harvestapp-sdk](https://pkg.go.dev/github.com/sergeykuzmich/harvestapp-sdk?tab=doc)
