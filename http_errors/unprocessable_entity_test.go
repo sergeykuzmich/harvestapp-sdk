@@ -1,4 +1,4 @@
-package http_errors
+package errors
 
 import (
 	"bytes"
@@ -13,9 +13,9 @@ import (
 
 func TestCreateUnprocessableEntityError(t *testing.T) {
 	path := "/422"
-	body := "{" +
-		"\"default_hourly_rate\":120.0" +
-		"}"
+	body := `{
+		"default_hourly_rate":120.0
+	}`
 	errorMessage := fmt.Sprintf("Unprocessable Entity: %s %s", path, []byte(body))
 
 	var err *UnprocessableEntity
@@ -28,12 +28,12 @@ func TestCreateUnprocessableEntityError(t *testing.T) {
 
 func TestCreateFromUnprocessableEntityResponse(t *testing.T) {
 	path := "/422"
-	req_body := "{" +
-		"\"default_hourly_rate\":120.0" +
-		"}"
-	res_body := "{" +
-		"\"message\": \"Name can't be blank\"" +
-		"}"
+	req_body := `{
+		"default_hourly_rate":120.0
+	}`
+	res_body := `{
+		"message": "Name can't be blank"
+	}`
 
 	buffer := new(bytes.Buffer)
 	json.NewEncoder(buffer).Encode(req_body)

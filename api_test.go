@@ -1,4 +1,4 @@
-package sdk
+package hrvst
 
 import (
 	"testing"
@@ -6,27 +6,27 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestHarvestClient(t *testing.T) {
-	AccountId := "ACCOUNTID"
+func TestHrvstClientArguments(t *testing.T) {
+	AccountID := "ACCOUNTID"
 	AccessToken := "TOKEN"
 
-	harvest := Harvest(AccountId, AccessToken)
+	client := Client(AccountID, AccessToken)
 
-	assert.Equal(t, AccountId, harvest.AccountId)
-	assert.Equal(t, AccessToken, harvest.AccessToken)
+	assert.Equal(t, AccountID, client.AccountID)
+	assert.Equal(t, AccessToken, client.AccessToken)
 }
 
 func TestInvalidJsonResponse(t *testing.T) {
-	harvest := HarvestTestClient()
+	client := testClient()
 
-	_, err := harvest.GetTask(8083801, Defaults())
+	_, err := client.GetTask(8083801, Defaults())
 	assert.NotNil(t, err)
 }
 
 func TestInvalidServerResponse(t *testing.T) {
-	harvest := HarvestTestClient()
-	harvest.apiUrl = mockUnstartedServerResponse().URL
+	client := testClient()
+	client.apiURL = mockUnstartedServerResponse().URL
 
-	_, err := harvest.GetTask(8083801, Defaults())
+	_, err := client.GetTask(8083801, Defaults())
 	assert.NotNil(t, err)
 }

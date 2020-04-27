@@ -1,17 +1,17 @@
-package sdk
+package hrvst
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/sergeykuzmich/harvestapp-sdk/http_errors"
+	httpErrors "github.com/sergeykuzmich/harvestapp-sdk/http_errors"
 )
 
 func TestGetExistingTask(t *testing.T) {
-	harvest := HarvestTestClient()
+	client := testClient()
 
-	task, err := harvest.GetTask(8083800, Defaults())
+	task, err := client.GetTask(8083800, Defaults())
 	assert.Nil(t, err)
 
 	assert.NotNil(t, task)
@@ -20,24 +20,24 @@ func TestGetExistingTask(t *testing.T) {
 }
 
 func TestGetNonExistingTask(t *testing.T) {
-	harvest := HarvestTestClient()
+	client := testClient()
 
-	_, err := harvest.GetTask(404, Defaults())
+	_, err := client.GetTask(404, Defaults())
 	assert.NotNil(t, err)
 
 	// Since SDK uses own errors check correct type is returned
-	_, ok := err.(*http_errors.NotFound)
+	_, ok := err.(*httpErrors.NotFound)
 	assert.True(t, ok)
 }
 
 func TestCreateTask(t *testing.T) {
-	harvest := HarvestTestClient()
+	client := testClient()
 
 	valid_task := &Task{
 		Name: "New Task Name",
 	}
 
-	task, err := harvest.CreateTask(valid_task, Defaults())
+	task, err := client.CreateTask(valid_task, Defaults())
 	assert.Nil(t, err)
 
 	assert.NotNil(t, task)
@@ -46,7 +46,7 @@ func TestCreateTask(t *testing.T) {
 }
 
 func TestCreateInvalidTask(t *testing.T) {
-	harvest := HarvestTestClient()
+	client := testClient()
 
 	invalid_task := &Task{
 		DefaultHourlyRate: 120.0,
@@ -55,31 +55,32 @@ func TestCreateInvalidTask(t *testing.T) {
 	args := Arguments{}
 	args["status"] = "422"
 
-	_, err := harvest.CreateTask(invalid_task, args)
+	_, err := client.CreateTask(invalid_task, args)
 	assert.NotNil(t, err)
 
 	// Since SDK uses own errors check correct type is returned
-	_, ok := err.(*http_errors.UnprocessableEntity)
+	_, ok := err.(*httpErrors.UnprocessableEntity)
 	assert.True(t, ok)
 
-	/* There is a way to check error details:
-
-	err, ok := err.(*http_errors.UnprocessableEntity)
-	assert.True(t, ok)
-	expectedDetails = "{'message':'Name can't be blank'}"
-	assert.Equal(t, err.Details(), expectedDetails)
-	*/
+	// The way to check error details:
+	//
+	//	asUnprocessableEntityError, ok := err.(*httpErrors.UnprocessableEntity)
+	//	assert.True(t, ok)
+	//	expectedDetails := `{
+	//		"message": "Name can't be blank"
+	//	}`
+	//	assert.Equal(t, asUnprocessableEntityError.Details(), expectedDetails)
 }
 
 func TestUpdateTaskWithValidInput(t *testing.T) {
-	harvest := HarvestTestClient()
+	client := testClient()
 
 	valid_task := &Task{
 		ID:                8083782,
 		DefaultHourlyRate: 120.0,
 	}
 
-	task, err := harvest.UpdateTask(valid_task, Defaults())
+	task, err := client.UpdateTask(valid_task, Defaults())
 	assert.Nil(t, err)
 
 	assert.NotNil(t, task)
@@ -88,7 +89,7 @@ func TestUpdateTaskWithValidInput(t *testing.T) {
 }
 
 func TestUpdateTaskWithInvalidInput(t *testing.T) {
-	harvest := HarvestTestClient()
+	client := testClient()
 
 	invalid_task := &Task{
 		ID:   8083783,
@@ -98,43 +99,43 @@ func TestUpdateTaskWithInvalidInput(t *testing.T) {
 	args := Arguments{}
 	args["status"] = "422"
 
-	_, err := harvest.UpdateTask(invalid_task, args)
+	_, err := client.UpdateTask(invalid_task, args)
 	assert.NotNil(t, err)
 
 	// Since SDK uses own errors check correct type is returned
-	_, ok := err.(*http_errors.UnprocessableEntity)
+	_, ok := err.(*httpErrors.UnprocessableEntity)
 	assert.True(t, ok)
 }
 
 func TestUpdateNonExistingTask(t *testing.T) {
-	harvest := HarvestTestClient()
+	client := testClient()
 
 	task := &Task{
 		ID:   404,
 		Name: "Management",
 	}
 
-	_, err := harvest.UpdateTask(task, Defaults())
+	_, err := client.UpdateTask(task, Defaults())
 	assert.NotNil(t, err)
 
 	// Since SDK uses own errors check correct type is returned
-	_, ok := err.(*http_errors.NotFound)
+	_, ok := err.(*httpErrors.NotFound)
 	assert.True(t, ok)
 }
 
 func TestDeleteTask(t *testing.T) {
-	harvest := HarvestTestClient()
+	client := testClient()
 
-	err := harvest.DeleteTask(8083782, Defaults())
+	err := client.DeleteTask(8083782, Defaults())
 	assert.Nil(t, err)
 }
 
 func TestDeleteNonExistingTask(t *testing.T) {
-	harvest := HarvestTestClient()
+	client := testClient()
 
-	err := harvest.DeleteTask(404, Defaults())
+	err := client.DeleteTask(404, Defaults())
 	assert.NotNil(t, err)
 
-	_, ok := err.(*http_errors.NotFound)
+	_, ok := err.(*httpErrors.NotFound)
 	assert.True(t, ok)
 }

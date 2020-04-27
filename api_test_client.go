@@ -1,4 +1,4 @@
-package sdk
+package hrvst
 
 import (
 	"fmt"
@@ -11,9 +11,9 @@ import (
 	"strings"
 )
 
-func HarvestTestClient() *API {
-	a := Harvest("ACCOUNTID", "TOKEN")
-	a.apiUrl = mockDynamicResponse().URL
+func testClient() *API {
+	a := Client("ACCOUNTID", "TOKEN")
+	a.apiURL = mockDynamicResponse().URL
 	return a
 }
 

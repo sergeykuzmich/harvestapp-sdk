@@ -1,23 +1,24 @@
-package http_errors
+package errors
 
 import (
 	"io/ioutil"
 	"net/http"
 )
 
-type HttpError interface {
+// HTTPError is an interface for errors which can be returned.
+type HTTPError interface {
 	error
-
-	// RAW response body
 	Details() []byte
 	Path() string
 }
 
-func CreateFromResponse(response *http.Response) HttpError {
+// CreateFromResponse converts http.Response with non 2** status code
+// to Error with HTTPError interface.
+func CreateFromResponse(response *http.Response) HTTPError {
 	body, _ := ioutil.ReadAll(response.Body)
 	path := response.Request.URL.Path
 
-	var error HttpError
+	var error HTTPError
 
 	switch status := response.StatusCode; {
 	case status == 401:
