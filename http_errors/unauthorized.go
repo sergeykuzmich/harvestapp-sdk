@@ -2,7 +2,7 @@ package errors
 
 import "fmt"
 
-// Forbidden is returned in case of ivalid Harvest credentials.
+// Unauthorized is returned in case of ivalid Harvest credentials.
 type Unauthorized struct {
 	path string
 	body []byte

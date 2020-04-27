@@ -63,12 +63,12 @@ func TestCreateInvalidTask(t *testing.T) {
 	assert.True(t, ok)
 
 	// The way to check error details:
-  //
+	//
 	//	asUnprocessableEntityError, ok := err.(*httpErrors.UnprocessableEntity)
 	//	assert.True(t, ok)
-	//	expectedDetails := "{" +
-	//		"\"message\": \"Name can't be blank\"" +
-	//	"}"
+	//	expectedDetails := `{
+	//		"message": "Name can't be blank"
+	//	}`
 	//	assert.Equal(t, asUnprocessableEntityError.Details(), expectedDetails)
 }
 

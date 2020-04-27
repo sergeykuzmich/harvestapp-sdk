@@ -2,7 +2,7 @@ package errors
 
 import "fmt"
 
-// HotFound is returned in case of requesting non-existing resource.
+// NotFound is returned in case of requesting non-existing resource.
 type NotFound struct {
 	path string
 	body []byte
