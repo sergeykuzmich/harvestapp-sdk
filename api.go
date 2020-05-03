@@ -62,10 +62,17 @@ func (a *API) createRequest(method string, path string, queryData Arguments, pos
 
 	buffer := new(bytes.Buffer)
 	if postData != nil {
-		json.NewEncoder(buffer).Encode(postData)
+		err := json.NewEncoder(buffer).Encode(postData)
+		if err != nil {
+			panic(err)
+		}
 	}
 
-	req, _ := http.NewRequest(method, urlWithParams, buffer)
+	req, err := http.NewRequest(method, urlWithParams, buffer)
+	if err != nil {
+		panic(err)
+	}
+
 	a.addHeaders(req)
 
 	return req
@@ -84,7 +91,10 @@ func (a *API) doRequest(req *http.Request, target interface{}) error {
 	}
 
 	if target != nil {
-		body, _ := ioutil.ReadAll(res.Body)
+		body, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			panic(err)
+		}
 
 		return a.decodeBody(body, target)
 	}
