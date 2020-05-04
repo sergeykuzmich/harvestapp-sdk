@@ -24,9 +24,9 @@ type API struct {
 	AccessToken string
 }
 
-// Client initializes Harvest API Client with auth credentials:
+// Client initializes Harvest API worker with auth credentials:
 //	* Account ID;
-//	* Api Token.
+//	* API Token.
 func Client(accountID string, accessToken string) *API {
 	a := API{}
 	a.client = http.DefaultClient
@@ -36,7 +36,7 @@ func Client(accountID string, accessToken string) *API {
 	return &a
 }
 
-// Applies relevant User-Agent, Accept & Authorization.
+// addHeaders applies relevant User-Agent, Accept & Authorization.
 func (a *API) addHeaders(req *http.Request) {
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
@@ -45,7 +45,7 @@ func (a *API) addHeaders(req *http.Request) {
 	req.Header.Set("Authorization", "Bearer "+a.AccessToken)
 }
 
-// Decode respose JSON to provided target interface.
+// decodeBody reads respose JSON to provided target interface.
 func (a *API) decodeBody(jsonBody []byte, target interface{}) error {
 	err := json.Unmarshal(jsonBody, target)
 	if err != nil {
@@ -55,7 +55,7 @@ func (a *API) decodeBody(jsonBody []byte, target interface{}) error {
 	return nil
 }
 
-// Prepare & fill http.Request with URI, query, body & headers.
+// createRequest prepares & fills http.Request with URI, query, body & headers.
 func (a *API) createRequest(method string, path string, queryData Arguments, postData interface{}) *http.Request {
 	url := fmt.Sprintf("%s%s", a.apiURL, path)
 	urlWithParams := fmt.Sprintf("%s?%s", url, queryData.toURLValues().Encode())
@@ -78,6 +78,7 @@ func (a *API) createRequest(method string, path string, queryData Arguments, pos
 	return req
 }
 
+// doRequest performs http request & pass response to `decodeBody` or `httpErrors`
 func (a *API) doRequest(req *http.Request, target interface{}) error {
 	res, err := a.client.Do(req)
 	if err != nil {
@@ -102,41 +103,45 @@ func (a *API) doRequest(req *http.Request, target interface{}) error {
 	return nil
 }
 
-// Get allows to perform direct GET request to Harvest API with:
+// Get performs direct GET request to Harvest API with:
 //	* path		- https://API.harvestapp.com/v2/{path};
 //	* args		- as query variables;
-//	* target	- interface response should be placed to.
+//	* target	- interface response should be placed to;
+//  ** - auth headers are included.
 func (a *API) Get(path string, args Arguments, target interface{}) error {
 	req := a.createRequest("GET", path, args, nil)
 
 	return a.doRequest(req, target)
 }
 
-// Delete allows to perform direct DELETE request to Harvest API with:
+// Delete performs direct DELETE request to Harvest API with:
 //	* path	- https://API.harvestapp.com/v2/{path};
-//	* args	- as query variables.
+//	* args	- as query variables;
+//  ** - auth headers are included.
 func (a *API) Delete(path string, args Arguments) error {
 	req := a.createRequest("DELETE", path, args, nil)
 
 	return a.doRequest(req, nil)
 }
 
-// Post allows to perform direct POST request to Harvest API with:
+// Post performs direct POST request to Harvest API with:
 //	* path		- https://API.harvestapp.com/v2/{path};
 //	* args		- as query variables;
 //	* body		- as body;
-//	* target	- interface response should be placed to.
+//	* target	- interface response should be placed to;
+//  ** - auth headers are included.
 func (a *API) Post(path string, args Arguments, body interface{}, target interface{}) error {
 	req := a.createRequest("POST", path, args, body)
 
 	return a.doRequest(req, target)
 }
 
-// Patch allows to perform direct PATCH request to Harvest API with:
+// Patch performs direct PATCH request to Harvest API with:
 //	* path		- https://API.harvestapp.com/v2/{path};
 //	* args		- as query variables;
 //	* body		- as body;
-//	* target	- interface response should be placed to.
+//	* target	- interface response should be placed to;
+//  ** - auth headers are included.
 func (a *API) Patch(path string, args Arguments, body interface{}, target interface{}) error {
 	req := a.createRequest("PATCH", path, args, body)
 
