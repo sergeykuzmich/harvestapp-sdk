@@ -5,8 +5,9 @@ import (
 	"time"
 )
 
-// Task is a struct to represet Harvest Task.
-// > Allows to perform `struct` -> `JSON` & `JSON` -> `struct` conversion.
+// Task is a struct to represent Harvest Task, performs:
+//  * `struct` -> `JSON` convertion;
+//  * `JSON` -> `struct` conversion.
 type Task struct {
 	ID                int       `json:"id"`
 	Name              string    `json:"name"`
@@ -34,7 +35,7 @@ func (a *API) CreateTask(t *Task, args Arguments) (task *Task, err error) {
 }
 
 // UpdateTask performs Harvest Task update to match *Task{} object.
-// > Task.ID is used to determine Harvest Task to update.
+// * Task.ID is used to determine Harvest Task should be updated.
 func (a *API) UpdateTask(t *Task, args Arguments) (task *Task, err error) {
 	task = &Task{}
 	path := fmt.Sprintf("/tasks/%v", t.ID)
