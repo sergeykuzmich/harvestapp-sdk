@@ -28,7 +28,11 @@ func mockDynamicResponse() *httptest.Server {
 		if customStatus != "" {
 			parts[len(parts)-1] = parts[len(parts)-1] + "-" + customStatus
 
-			responseStatus, _ := strconv.Atoi(customStatus)
+			responseStatus, err := strconv.Atoi(customStatus)
+			if err != nil {
+				panic(err)
+			}
+
 			rw.WriteHeader(responseStatus)
 		}
 
@@ -37,9 +41,14 @@ func mockDynamicResponse() *httptest.Server {
 
 		if _, err := os.Stat(filename); os.IsNotExist(err) {
 			http.Error(rw, fmt.Sprintf("%s doesn't exist", filename), http.StatusNotFound)
+			return
 		}
 
-		mockData, _ := ioutil.ReadFile(filename)
+		mockData, err := ioutil.ReadFile(filename)
+		if err != nil {
+			panic(err)
+		}
+
 		rw.Write(mockData)
 	}))
 }
