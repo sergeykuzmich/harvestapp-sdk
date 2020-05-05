@@ -65,9 +65,9 @@ func (a *API) getPaginatedTasks(args Arguments) (tasks []*Task, next tasksPagina
 }
 
 // GetTasks returns list Harvest Tasks.
-// * args["force"] = "true" - is used to get ALL tasks without breaking to pages
+// * args["paginated"] = "true" - is used to get ALL tasks without breaking to pages
 func (a *API) GetTasks(args Arguments) (tasks []*Task, next tasksPaginated, err error) {
-	if args["paged"] == "false" {
+	if args["paginated"] == "false" {
 		tasks, err = a.getAllTasks(args)
 		return tasks, nil, err
 	} else {
