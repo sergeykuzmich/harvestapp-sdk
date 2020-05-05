@@ -36,14 +36,14 @@ func (a *API) getAllTasks(args Arguments) (tasks []*Task, err error) {
 	}
 
 	var pageTasks []*Task
-  for ok := (next != nil); ok; ok = (next != nil) {
-      pageTasks, next, err = next()
-      if err != nil {
-          return nil, err
-      }
+	for ok := (next != nil); ok; ok = (next != nil) {
+		pageTasks, next, err = next()
+		if err != nil {
+			return nil, err
+		}
 
-      tasks = append(tasks, pageTasks...)
-  }
+		tasks = append(tasks, pageTasks...)
+	}
 
 	return tasks, err
 }
