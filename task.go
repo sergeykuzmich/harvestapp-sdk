@@ -70,9 +70,9 @@ func (a *API) GetTasks(args Arguments) (tasks []*Task, next tasksPaginated, err 
 	if args["paginated"] == "false" {
 		tasks, err = a.getAllTasks(args)
 		return tasks, nil, err
-	} else {
-		return a.getPaginatedTasks(args)
 	}
+
+	return a.getPaginatedTasks(args)
 }
 
 // GetTask returns Harvest Task with specified ID.
