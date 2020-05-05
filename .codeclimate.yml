@@ -1,0 +1,6 @@
+engines:
+  golint:
+    enabled: true
+    checks:
+      GoLint/Unexported-Type-In-Api/:
+        enabled: false
