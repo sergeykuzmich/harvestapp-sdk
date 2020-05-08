@@ -166,7 +166,7 @@ func TestGetTasksNonPaginated(t *testing.T) {
 	client := testClient()
 
 	args := Defaults()
-	args["paginated"] = "false"
+	args[GET_ALL] = "true"
 	tasks, next, err := client.GetTasks(args)
 	assert.Nil(t, err)
 	assert.Nil(t, next)
