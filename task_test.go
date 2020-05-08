@@ -5,6 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/sergeykuzmich/harvestapp-sdk/flags"
 	httpErrors "github.com/sergeykuzmich/harvestapp-sdk/http_errors"
 )
 
@@ -166,7 +167,7 @@ func TestGetTasksNonPaginated(t *testing.T) {
 	client := testClient()
 
 	args := Defaults()
-	args[GET_ALL] = "true"
+	args[flags.GetAll] = "true"
 	tasks, next, err := client.GetTasks(args)
 	assert.Nil(t, err)
 	assert.Nil(t, next)

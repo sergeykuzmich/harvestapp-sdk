@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strconv"
 	"time"
+
+	"github.com/sergeykuzmich/harvestapp-sdk/flags"
 )
 
 type tasksResponse struct {
@@ -65,9 +67,9 @@ func (a *API) getPaginatedTasks(args Arguments) (tasks []*Task, next tasksPagina
 }
 
 // GetTasks returns list Harvest Tasks.
-// * args[GET_ALL] = "true" - is used to get ALL tasks without breaking to pages
+// * args[flags.GetAll] = "true" - is used to get ALL tasks without breaking to pages
 func (a *API) GetTasks(args Arguments) (tasks []*Task, next tasksPaginated, err error) {
-	if args[GET_ALL] == "true" {
+	if args[flags.GetAll] == "true" {
 		tasks, err = a.getAllTasks(args)
 		return tasks, nil, err
 	}
