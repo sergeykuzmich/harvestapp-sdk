@@ -5,6 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/sergeykuzmich/harvestapp-sdk/flags"
 	httpErrors "github.com/sergeykuzmich/harvestapp-sdk/http_errors"
 )
 
@@ -138,4 +139,37 @@ func TestDeleteNonExistingTask(t *testing.T) {
 
 	_, ok := err.(*httpErrors.NotFound)
 	assert.True(t, ok)
+}
+
+func TestGetTasksPaginated(t *testing.T) {
+	client := testClient()
+
+	var all []*Task
+
+	tasks, next, err := client.GetTasks(Defaults())
+	assert.Nil(t, err)
+	assert.NotNil(t, next)
+	assert.Equal(t, 3, len(tasks))
+
+	all = append(all, tasks...)
+
+	tasks, next, err = next()
+	assert.Nil(t, err)
+	assert.Nil(t, next)
+	assert.Equal(t, 2, len(tasks))
+
+	all = append(all, tasks...)
+
+	assert.Equal(t, 5, len(all))
+}
+
+func TestGetTasksNonPaginated(t *testing.T) {
+	client := testClient()
+
+	args := Defaults()
+	args[flags.GetAll] = "true"
+	tasks, next, err := client.GetTasks(args)
+	assert.Nil(t, err)
+	assert.Nil(t, next)
+	assert.Equal(t, 5, len(tasks))
 }

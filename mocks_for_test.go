@@ -36,6 +36,11 @@ func mockDynamicResponse() *httptest.Server {
 			rw.WriteHeader(responseStatus)
 		}
 
+		pagination := strings.Join(r.URL.Query()["page"], "")
+		if pagination != "" {
+			parts[len(parts)-1] = parts[len(parts)-1] + "-P" + pagination
+		}
+
 		parts[len(parts)-1] = parts[len(parts)-1] + ".json"
 		filename := filepath.Join(parts...)
 

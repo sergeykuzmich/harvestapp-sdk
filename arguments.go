@@ -2,6 +2,9 @@ package hrvst
 
 import (
 	"net/url"
+	"strings"
+
+	"github.com/sergeykuzmich/harvestapp-sdk/flags"
 )
 
 // Arguments [`key`=>`value`] dictionary should be passed as a GET query string
@@ -16,7 +19,10 @@ func Defaults() Arguments {
 func (args Arguments) toURLValues() url.Values {
 	v := url.Values{}
 	for key, value := range args {
-		v.Set(key, value)
+		// Skip all internal flags while making query string
+		if !strings.HasPrefix(key, flags.Prefix) {
+			v.Set(key, value)
+		}
 	}
 	return v
 }
