@@ -42,7 +42,7 @@ func (a *API) getAllTasks(args Arguments) (tasks []*Task, err error) {
 func (a *API) GetTasks(args Arguments) (tasks []*Task, next tasksPaginated, err error) {
 	var wrapper func(rawNext Paginated) ([]*Task, tasksPaginated, error)
 
-	wrapper = func(rawNext Paginated) ([]*Task, tasksPaginated, error) {
+	wrapper = func(rawNext Paginated) (tasks []*Task, next tasksPaginated, err error) {
 		pagedResponse := &tasksResponse{}
 		var nextPage Paginated
 
@@ -52,13 +52,15 @@ func (a *API) GetTasks(args Arguments) (tasks []*Task, next tasksPaginated, err 
 			nextPage, err = a.GetPaginated("/tasks", args, pagedResponse)
 		}
 
+		tasks = pagedResponse.Data
+
 		if nextPage != nil {
 			next = func() ([]*Task, tasksPaginated, error) {
 				return wrapper(nextPage)
 			}
 		}
 
-		return pagedResponse.Data, next, err
+		return
 	}
 
 	return wrapper(nil)
