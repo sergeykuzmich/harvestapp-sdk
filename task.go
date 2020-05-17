@@ -49,7 +49,7 @@ func (a *API) GetTasks(args Arguments) (tasks []*Task, next tasksPaginated, err 
 			}
 		}
 
-		return
+		return tasks, next, err
 	}
 
 	return wrapper(nil)
