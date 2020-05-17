@@ -29,7 +29,6 @@ type API struct {
 
 type paginationInfo struct {
 	NextPage int `json:"next_page"`
-	PerPage  int `json:"per_page"`
 }
 
 type Paginated func(interface{}) (Paginated, error)
@@ -140,7 +139,6 @@ func (a *API) GetPaginated(path string, args Arguments, target interface{}) (nex
 	if page.NextPage != 0 {
 		next = func(nextTarget interface{}) (next Paginated, err error) {
 			args["page"] = strconv.Itoa(page.NextPage)
-			args["per_page"] = strconv.Itoa(page.PerPage)
 			return a.GetPaginated(path, args, nextTarget)
 		}
 	}
