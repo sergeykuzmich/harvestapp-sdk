@@ -3,8 +3,6 @@ package hrvst
 import (
 	"fmt"
 	"time"
-
-	"github.com/sergeykuzmich/harvestapp-sdk/flags"
 )
 
 type tasksResponse struct {
@@ -26,15 +24,6 @@ type Task struct {
 	IsActive          bool      `json:"is_active"`
 	CreatedAt         time.Time `json:"created_at"`
 	UpdatedAt         time.Time `json:"updated_at"`
-}
-
-// getAllTasks forcely returns all Harvest Tasks existed on the Account
-func (a *API) getAllTasks(args Arguments) (tasks []*Task, err error) {
-	args[flags.GetAll] = "true"
-
-	tasks, _, err = a.GetTasks(args)
-
-	return tasks, err
 }
 
 // GetTasks returns list Harvest Tasks.
