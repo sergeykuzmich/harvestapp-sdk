@@ -6,8 +6,7 @@ import (
 )
 
 type tasksResponse struct {
-	NextPage int     `json:"next_page"`
-	Data     []*Task `json:"tasks"`
+	Data []*Task `json:"tasks"`
 }
 
 type tasksPaginated func() ([]*Task, tasksPaginated, error)

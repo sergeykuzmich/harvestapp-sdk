@@ -130,46 +130,47 @@ func (a *API) Get(path string, args Arguments, target interface{}) error {
 }
 
 func (a *API) getPaginated(path string, args Arguments, target interface{}) (next paginated, err error) {
-	req := a.createRequest("GET", path, args, nil)
+	targetValue := reflect.Indirect(reflect.ValueOf(target))
 
-	page := &paginationInfo{}
-	err = a.doRequest(req, target, page)
+	if targetValue.FieldByName("Data").Kind() != reflect.Slice {
+		panic("Target interface must have Data field")
+	}
 
-	if page.NextPage != 0 {
-		next = func(nextTarget interface{}) (next paginated, err error) {
-			args["page"] = strconv.Itoa(page.NextPage)
-			return a.getPaginated(path, args, nextTarget)
+	next = func(i interface{}) (paginated, error) {
+		req := a.createRequest("GET", path, args, nil)
+
+		page := &paginationInfo{}
+		err = a.doRequest(req, i, page)
+
+		var next_ paginated
+		if page.NextPage != 0 {
+			next_ = func(nextTarget interface{}) (next paginated, err error) {
+				args["page"] = strconv.Itoa(page.NextPage)
+				return a.getPaginated(path, args, nextTarget)
+			}
 		}
+
+		return next_, err
 	}
 
 	if args[flags.GetAll] != "true" {
-		return next, err
+		return next(target)
 	}
 
-	if next != nil {
-		targetValue := reflect.Indirect(reflect.ValueOf(target))
+	data := targetValue.FieldByName("Data")
 
-		if targetValue.FieldByName("Data").Kind() != reflect.Slice {
-			panic("Target interface must have Data field")
+	for ok := (next != nil); ok; ok = (next != nil) {
+		targetCopy := reflect.New(targetValue.Type())
+
+		next, err = next(targetCopy.Interface())
+		if err != nil {
+			return nil, err
 		}
 
-		targetType := targetValue.Type()
-
-		data := targetValue.FieldByName("Data")
-
-		for ok := (next != nil); ok; ok = (next != nil) {
-			targetCopy := reflect.New(targetType)
-
-			next, err = next(targetCopy.Interface())
-			if err != nil {
-				return nil, err
-			}
-
-			data = reflect.AppendSlice(data, reflect.Indirect(targetCopy).FieldByName("Data"))
-		}
-
-		targetValue.FieldByName("Data").Set(data)
+		data = reflect.AppendSlice(data, reflect.Indirect(targetCopy).FieldByName("Data"))
 	}
+
+	targetValue.FieldByName("Data").Set(data)
 
 	return nil, err
 }
