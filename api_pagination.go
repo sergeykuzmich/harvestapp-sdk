@@ -12,6 +12,8 @@ type paginationInfo struct {
 
 type paginated func(interface{}) (paginated, error)
 
+// getPaginated performs GET request with generalized pagination
+// * args[flags.GetAll] = "true" - is used to get ALL tasks without breaking to pages
 func (a *API) getPaginated(path string, args Arguments, target interface{}) (next paginated, err error) {
 	targetValue := reflect.Indirect(reflect.ValueOf(target))
 
