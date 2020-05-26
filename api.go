@@ -5,13 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/pkg/errors"
-	"github.com/sergeykuzmich/harvestapp-sdk/flags"
+	httpErrors "github.com/sergeykuzmich/harvestapp-sdk/http_errors"
 	"io/ioutil"
 	"net/http"
-	"reflect"
-	"strconv"
-
-	httpErrors "github.com/sergeykuzmich/harvestapp-sdk/http_errors"
 )
 
 const clientVersion = "1.0.0"
@@ -25,12 +21,6 @@ type API struct {
 	AccountID   string
 	AccessToken string
 }
-
-type paginationInfo struct {
-	NextPage int `json:"next_page"`
-}
-
-type paginated func(interface{}) (paginated, error)
 
 // Client initializes Harvest API worker with auth credentials:
 //	* Account ID;
@@ -86,36 +76,22 @@ func (a *API) createRequest(method string, path string, queryData Arguments, pos
 	return req
 }
 
-// doRequest performs http request & pass response to `decodeBody` or `httpErrors`
-func (a *API) doRequest(req *http.Request, target interface{}, withPagination *paginationInfo) error {
+// doRequest performs http request & returns raw body
+func (a *API) doRequest(req *http.Request) (body []byte, err error) {
 	res, err := a.client.Do(req)
 	if err != nil {
-		return errors.Wrapf(err, "HTTP request failed: `%s`", req.URL.Path)
+		return nil, errors.Wrapf(err, "HTTP request failed: `%s`", req.URL.Path)
 	}
 
 	defer res.Body.Close()
 
 	if res.StatusCode < 200 || res.StatusCode > 299 {
-		return httpErrors.CreateFromResponse(res)
+		return nil, httpErrors.CreateFromResponse(res)
 	}
 
-	if target != nil {
-		body, err := ioutil.ReadAll(res.Body)
-		if err != nil {
-			panic(err)
-		}
+	body, err = ioutil.ReadAll(res.Body)
 
-		if withPagination != nil {
-			err = a.decodeBody(body, withPagination)
-			if err != nil {
-				return err
-			}
-		}
-
-		return a.decodeBody(body, target)
-	}
-
-	return nil
+	return body, nil
 }
 
 // Get performs direct GET request to Harvest API with:
@@ -126,53 +102,12 @@ func (a *API) doRequest(req *http.Request, target interface{}, withPagination *p
 func (a *API) Get(path string, args Arguments, target interface{}) error {
 	req := a.createRequest("GET", path, args, nil)
 
-	return a.doRequest(req, target, nil)
-}
-
-func (a *API) getPaginated(path string, args Arguments, target interface{}) (next paginated, err error) {
-	targetValue := reflect.Indirect(reflect.ValueOf(target))
-
-	if targetValue.FieldByName("Data").Kind() != reflect.Slice {
-		panic("Target interface must have Data field")
+	body, err := a.doRequest(req)
+	if err != nil {
+		return err
 	}
 
-	next = func(i interface{}) (paginated, error) {
-		req := a.createRequest("GET", path, args, nil)
-
-		page := &paginationInfo{}
-		err = a.doRequest(req, i, page)
-
-		var next_ paginated
-		if page.NextPage != 0 {
-			next_ = func(nextTarget interface{}) (next paginated, err error) {
-				args["page"] = strconv.Itoa(page.NextPage)
-				return a.getPaginated(path, args, nextTarget)
-			}
-		}
-
-		return next_, err
-	}
-
-	if args[flags.GetAll] != "true" {
-		return next(target)
-	}
-
-	data := targetValue.FieldByName("Data")
-
-	for ok := (next != nil); ok; ok = (next != nil) {
-		targetCopy := reflect.New(targetValue.Type())
-
-		next, err = next(targetCopy.Interface())
-		if err != nil {
-			return nil, err
-		}
-
-		data = reflect.AppendSlice(data, reflect.Indirect(targetCopy).FieldByName("Data"))
-	}
-
-	targetValue.FieldByName("Data").Set(data)
-
-	return nil, err
+	return a.decodeBody(body, target)
 }
 
 // Delete performs direct DELETE request to Harvest API with:
@@ -182,7 +117,8 @@ func (a *API) getPaginated(path string, args Arguments, target interface{}) (nex
 func (a *API) Delete(path string, args Arguments) error {
 	req := a.createRequest("DELETE", path, args, nil)
 
-	return a.doRequest(req, nil, nil)
+	_, err := a.doRequest(req)
+	return err
 }
 
 // Post performs direct POST request to Harvest API with:
@@ -194,7 +130,12 @@ func (a *API) Delete(path string, args Arguments) error {
 func (a *API) Post(path string, args Arguments, body interface{}, target interface{}) error {
 	req := a.createRequest("POST", path, args, body)
 
-	return a.doRequest(req, target, nil)
+	responseBody, err := a.doRequest(req)
+	if err != nil {
+		return err
+	}
+
+	return a.decodeBody(responseBody, target)
 }
 
 // Patch performs direct PATCH request to Harvest API with:
@@ -206,5 +147,10 @@ func (a *API) Post(path string, args Arguments, body interface{}, target interfa
 func (a *API) Patch(path string, args Arguments, body interface{}, target interface{}) error {
 	req := a.createRequest("PATCH", path, args, body)
 
-	return a.doRequest(req, target, nil)
+	responseBody, err := a.doRequest(req)
+	if err != nil {
+		return err
+	}
+
+	return a.decodeBody(responseBody, target)
 }
