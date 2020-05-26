@@ -4,13 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/pkg/errors"
 	"github.com/sergeykuzmich/harvestapp-sdk/flags"
 	"io/ioutil"
 	"net/http"
 	"reflect"
 	"strconv"
-
-	"github.com/pkg/errors"
 
 	httpErrors "github.com/sergeykuzmich/harvestapp-sdk/http_errors"
 )
@@ -31,7 +30,7 @@ type paginationInfo struct {
 	NextPage int `json:"next_page"`
 }
 
-type Paginated func(interface{}) (Paginated, error)
+type paginated func(interface{}) (paginated, error)
 
 // Client initializes Harvest API worker with auth credentials:
 //	* Account ID;
@@ -130,16 +129,16 @@ func (a *API) Get(path string, args Arguments, target interface{}) error {
 	return a.doRequest(req, target, nil)
 }
 
-func (a *API) GetPaginated(path string, args Arguments, target interface{}) (next Paginated, err error) {
+func (a *API) getPaginated(path string, args Arguments, target interface{}) (next paginated, err error) {
 	req := a.createRequest("GET", path, args, nil)
 
 	page := &paginationInfo{}
 	err = a.doRequest(req, target, page)
 
 	if page.NextPage != 0 {
-		next = func(nextTarget interface{}) (next Paginated, err error) {
+		next = func(nextTarget interface{}) (next paginated, err error) {
 			args["page"] = strconv.Itoa(page.NextPage)
-			return a.GetPaginated(path, args, nextTarget)
+			return a.getPaginated(path, args, nextTarget)
 		}
 	}
 

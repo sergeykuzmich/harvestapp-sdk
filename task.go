@@ -29,16 +29,16 @@ type Task struct {
 // GetTasks returns list Harvest Tasks.
 // * args[flags.GetAll] = "true" - is used to get ALL tasks without breaking to pages
 func (a *API) GetTasks(args Arguments) (tasks []*Task, next tasksPaginated, err error) {
-	var wrapper func(rawNext Paginated) ([]*Task, tasksPaginated, error)
+	var wrapper func(rawNext paginated) ([]*Task, tasksPaginated, error)
 
-	wrapper = func(rawNext Paginated) (tasks []*Task, next tasksPaginated, err error) {
+	wrapper = func(rawNext paginated) (tasks []*Task, next tasksPaginated, err error) {
 		pagedResponse := &tasksResponse{}
-		var nextPage Paginated
+		var nextPage paginated
 
 		if rawNext != nil {
 			nextPage, err = rawNext(pagedResponse)
 		} else {
-			nextPage, err = a.GetPaginated("/tasks", args, pagedResponse)
+			nextPage, err = a.getPaginated("/tasks", args, pagedResponse)
 		}
 
 		tasks = pagedResponse.Data
