@@ -78,29 +78,22 @@ func (a *API) createRequest(method string, path string, queryData Arguments, pos
 	return req
 }
 
-// doRequest performs http request & pass response to `decodeBody` or `httpErrors`
-func (a *API) doRequest(req *http.Request, target interface{}) error {
+// doRequest performs http request & returns raw body
+func (a *API) doRequest(req *http.Request) (body []byte, err error) {
 	res, err := a.client.Do(req)
 	if err != nil {
-		return errors.Wrapf(err, "HTTP request failed: `%s`", req.URL.Path)
+		return nil, errors.Wrapf(err, "HTTP request failed: `%s`", req.URL.Path)
 	}
 
 	defer res.Body.Close()
 
 	if res.StatusCode < 200 || res.StatusCode > 299 {
-		return httpErrors.CreateFromResponse(res)
+		return nil, httpErrors.CreateFromResponse(res)
 	}
 
-	if target != nil {
-		body, err := ioutil.ReadAll(res.Body)
-		if err != nil {
-			panic(err)
-		}
+	body, err = ioutil.ReadAll(res.Body)
 
-		return a.decodeBody(body, target)
-	}
-
-	return nil
+	return body, nil
 }
 
 // Get performs direct GET request to Harvest API with:
@@ -111,7 +104,12 @@ func (a *API) doRequest(req *http.Request, target interface{}) error {
 func (a *API) Get(path string, args Arguments, target interface{}) error {
 	req := a.createRequest("GET", path, args, nil)
 
-	return a.doRequest(req, target)
+	body, err := a.doRequest(req)
+	if err != nil {
+		return err
+	}
+
+	return a.decodeBody(body, target)
 }
 
 // Delete performs direct DELETE request to Harvest API with:
@@ -121,7 +119,21 @@ func (a *API) Get(path string, args Arguments, target interface{}) error {
 func (a *API) Delete(path string, args Arguments) error {
 	req := a.createRequest("DELETE", path, args, nil)
 
-	return a.doRequest(req, nil)
+	_, err := a.doRequest(req)
+	return err
+}
+
+// Shared PATCH, POST, PUT codebase.
+// Used as a wrapper to make API request with body.
+func (a *API) ppp(method string, path string, args Arguments, body interface{}, target interface{}) error {
+	req := a.createRequest(method, path, args, body)
+
+	responseBody, err := a.doRequest(req)
+	if err != nil {
+		return err
+	}
+
+	return a.decodeBody(responseBody, target)
 }
 
 // Post performs direct POST request to Harvest API with:
@@ -131,9 +143,7 @@ func (a *API) Delete(path string, args Arguments) error {
 //	* target	- interface response should be placed to;
 //  ** - auth headers are included.
 func (a *API) Post(path string, args Arguments, body interface{}, target interface{}) error {
-	req := a.createRequest("POST", path, args, body)
-
-	return a.doRequest(req, target)
+	return a.ppp("POST", path, args, body, target)
 }
 
 // Patch performs direct PATCH request to Harvest API with:
@@ -143,7 +153,5 @@ func (a *API) Post(path string, args Arguments, body interface{}, target interfa
 //	* target	- interface response should be placed to;
 //  ** - auth headers are included.
 func (a *API) Patch(path string, args Arguments, body interface{}, target interface{}) error {
-	req := a.createRequest("PATCH", path, args, body)
-
-	return a.doRequest(req, target)
+	return a.ppp("PATCH", path, args, body, target)
 }

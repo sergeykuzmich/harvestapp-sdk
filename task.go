@@ -2,15 +2,11 @@ package hrvst
 
 import (
 	"fmt"
-	"strconv"
 	"time"
-
-	"github.com/sergeykuzmich/harvestapp-sdk/flags"
 )
 
 type tasksResponse struct {
-	NextPage int     `json:"next_page"`
-	Tasks    []*Task `json:"tasks"`
+	Data []*Task `json:"tasks"`
 }
 
 type tasksPaginated func() ([]*Task, tasksPaginated, error)
@@ -29,52 +25,32 @@ type Task struct {
 	UpdatedAt         time.Time `json:"updated_at"`
 }
 
-// getAllTasks forcely returns all Harvest Tasks existed on the Account
-func (a *API) getAllTasks(args Arguments) (tasks []*Task, err error) {
-	tasks = make([]*Task, 0)
-
-	next := func() ([]*Task, tasksPaginated, error) {
-		return a.getPaginatedTasks(args)
-	}
-
-	var pageTasks []*Task
-	for ok := (next != nil); ok; ok = (next != nil) {
-		pageTasks, next, err = next()
-		if err != nil {
-			return nil, err
-		}
-
-		tasks = append(tasks, pageTasks...)
-	}
-
-	return tasks, err
-}
-
-// getPaginatedTasks returns Harvest Tasks as it returns Havest (divided by pages)
-func (a *API) getPaginatedTasks(args Arguments) (tasks []*Task, next tasksPaginated, err error) {
-	tasks = make([]*Task, 0)
-	pagedResponse := &tasksResponse{}
-	err = a.Get("/tasks", args, pagedResponse)
-
-	if pagedResponse.NextPage != 0 {
-		next = func() (tasks []*Task, next tasksPaginated, err error) {
-			args["page"] = strconv.Itoa(pagedResponse.NextPage)
-			return a.GetTasks(args)
-		}
-	}
-
-	return pagedResponse.Tasks, next, err
-}
-
 // GetTasks returns list Harvest Tasks.
 // * args[flags.GetAll] = "true" - is used to get ALL tasks without breaking to pages
 func (a *API) GetTasks(args Arguments) (tasks []*Task, next tasksPaginated, err error) {
-	if args[flags.GetAll] == "true" {
-		tasks, err = a.getAllTasks(args)
-		return tasks, nil, err
+	var wrapper func(nextPage paginated) ([]*Task, tasksPaginated, error)
+
+	wrapper = func(nextPage paginated) (tasks []*Task, next tasksPaginated, err error) {
+		pagedResponse := &tasksResponse{}
+
+		if nextPage != nil {
+			nextPage, err = nextPage(pagedResponse)
+		} else {
+			nextPage, err = a.getPaginated("/tasks", args, pagedResponse)
+		}
+
+		tasks = pagedResponse.Data
+
+		if nextPage != nil {
+			next = func() ([]*Task, tasksPaginated, error) {
+				return wrapper(nextPage)
+			}
+		}
+
+		return tasks, next, err
 	}
 
-	return a.getPaginatedTasks(args)
+	return wrapper(nil)
 }
 
 // GetTask returns Harvest Task with specified ID.

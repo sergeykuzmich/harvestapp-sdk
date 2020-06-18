@@ -151,6 +151,10 @@ func TestGetTasksPaginated(t *testing.T) {
 	assert.NotNil(t, next)
 	assert.Equal(t, 3, len(tasks))
 
+	assert.Equal(t, "Business Development", tasks[0].Name)
+	assert.Equal(t, "Research", tasks[1].Name)
+	assert.Equal(t, "Project Management", tasks[2].Name)
+
 	all = append(all, tasks...)
 
 	tasks, next, err = next()
@@ -158,9 +162,18 @@ func TestGetTasksPaginated(t *testing.T) {
 	assert.Nil(t, next)
 	assert.Equal(t, 2, len(tasks))
 
+	assert.Equal(t, "Programming", tasks[0].Name)
+	assert.Equal(t, "Graphic Design", tasks[1].Name)
+
 	all = append(all, tasks...)
 
 	assert.Equal(t, 5, len(all))
+
+	assert.Equal(t, "Business Development", all[0].Name)
+	assert.Equal(t, "Research", all[1].Name)
+	assert.Equal(t, "Project Management", all[2].Name)
+	assert.Equal(t, "Programming", all[3].Name)
+	assert.Equal(t, "Graphic Design", all[4].Name)
 }
 
 func TestGetTasksNonPaginated(t *testing.T) {
@@ -172,4 +185,10 @@ func TestGetTasksNonPaginated(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Nil(t, next)
 	assert.Equal(t, 5, len(tasks))
+
+	assert.Equal(t, "Business Development", tasks[0].Name)
+	assert.Equal(t, "Research", tasks[1].Name)
+	assert.Equal(t, "Project Management", tasks[2].Name)
+	assert.Equal(t, "Programming", tasks[3].Name)
+	assert.Equal(t, "Graphic Design", tasks[4].Name)
 }
