@@ -1,9 +1,13 @@
 package hrvst
 
 import (
-	"github.com/sergeykuzmich/harvestapp-sdk/flags"
+	"encoding/json"
 	"reflect"
 	"strconv"
+
+	"github.com/pkg/errors"
+
+	"github.com/sergeykuzmich/harvestapp-sdk/flags"
 )
 
 type paginationInfo struct {
@@ -14,14 +18,14 @@ type paginated func(interface{}) (paginated, error)
 
 // getPaginated performs GET request with generalized pagination
 // * args[flags.GetAll] = "true" - is used to get ALL tasks without breaking to pages
-func (a *API) getPaginated(path string, args Arguments, target interface{}) (next paginated, err error) {
-	targetValue := reflect.Indirect(reflect.ValueOf(target))
+func (a *API) getPaginated(path string, args Arguments, target interface{}) (nextPage paginated, err error) {
+	targetInstance := reflect.Indirect(reflect.ValueOf(target))
 
-	if targetValue.FieldByName("Data").Kind() != reflect.Slice {
-		panic("Target interface must have Data field")
+	if targetInstance.FieldByName("Data").Kind() != reflect.Slice {
+		panic("`targetInstance` must implement `Data` field mapped to response json field.")
 	}
 
-	next = func(i interface{}) (paginated, error) {
+	nextPage = func(i interface{}) (nextPage paginated, err error) {
 		req := a.createRequest("GET", path, args, nil)
 
 		responseBody, err := a.doRequest(req)
@@ -29,47 +33,56 @@ func (a *API) getPaginated(path string, args Arguments, target interface{}) (nex
 			return nil, err
 		}
 
-		err = a.decodeBody(responseBody, i)
-		if err != nil {
-			return nil, err
-		}
-
 		page := &paginationInfo{}
-
-		err = a.decodeBody(responseBody, page)
+		err = decodePaignatedBody(responseBody, i, page)
 		if err != nil {
 			return nil, err
 		}
 
-		var next_ paginated
 		if page.NextPage != 0 {
-			next_ = func(nextTarget interface{}) (next paginated, err error) {
+			nextPage = func(i interface{}) (nextPage paginated, err error) {
 				args["page"] = strconv.Itoa(page.NextPage)
-				return a.getPaginated(path, args, nextTarget)
+				return a.getPaginated(path, args, i)
 			}
 		}
 
-		return next_, err
+		return nextPage, err
 	}
 
 	if args[flags.GetAll] != "true" {
-		return next(target)
+		return nextPage(target)
 	}
 
-	data := targetValue.FieldByName("Data")
+	data := targetInstance.FieldByName("Data")
 
-	for ok := (next != nil); ok; ok = (next != nil) {
-		targetCopy := reflect.New(targetValue.Type())
+	for ok := (nextPage != nil); ok; ok = (nextPage != nil) {
+		targetInstanceCopy := reflect.New(targetInstance.Type())
 
-		next, err = next(targetCopy.Interface())
+		nextPage, err = nextPage(targetInstanceCopy.Interface())
 		if err != nil {
 			return nil, err
 		}
 
-		data = reflect.AppendSlice(data, reflect.Indirect(targetCopy).FieldByName("Data"))
+		data = reflect.AppendSlice(data, reflect.Indirect(targetInstanceCopy).FieldByName("Data"))
 	}
 
-	targetValue.FieldByName("Data").Set(data)
+	targetInstance.FieldByName("Data").Set(data)
 
 	return nil, err
+}
+
+
+// decodeBody reads respose JSON to provided target interface & paginationInfo interface.
+func decodePaignatedBody(jsonBody []byte, target interface{}, paginationInfo interface{}) (err error) {
+	err = json.Unmarshal(jsonBody, target)
+	if err != nil {
+		return errors.Wrapf(err, "JSON decode failed: `%s`", string(jsonBody))
+	}
+
+	err = json.Unmarshal(jsonBody, paginationInfo)
+	if err != nil {
+		return errors.Wrapf(err, "JSON decode failed: `%s`", string(jsonBody))
+	}
+
+	return nil
 }
