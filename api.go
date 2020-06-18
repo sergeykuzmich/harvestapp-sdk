@@ -123,14 +123,10 @@ func (a *API) Delete(path string, args Arguments) error {
 	return err
 }
 
-// Post performs direct POST request to Harvest API with:
-//	* path		- https://API.harvestapp.com/v2/{path};
-//	* args		- as query variables;
-//	* body		- as body;
-//	* target	- interface response should be placed to;
-//  ** - auth headers are included.
-func (a *API) Post(path string, args Arguments, body interface{}, target interface{}) error {
-	req := a.createRequest("POST", path, args, body)
+// Shared PATCH, POST, PUT codebase.
+// Used as a wrapper to make API request with body.
+func (a *API) ppp(method string, path string, args Arguments, body interface{}, target interface{}) error {
+	req := a.createRequest(method, path, args, body)
 
 	responseBody, err := a.doRequest(req)
 	if err != nil {
@@ -140,6 +136,16 @@ func (a *API) Post(path string, args Arguments, body interface{}, target interfa
 	return a.decodeBody(responseBody, target)
 }
 
+// Post performs direct POST request to Harvest API with:
+//	* path		- https://API.harvestapp.com/v2/{path};
+//	* args		- as query variables;
+//	* body		- as body;
+//	* target	- interface response should be placed to;
+//  ** - auth headers are included.
+func (a *API) Post(path string, args Arguments, body interface{}, target interface{}) error {
+	return a.ppp("POST", path, args, body, target)
+}
+
 // Patch performs direct PATCH request to Harvest API with:
 //	* path		- https://API.harvestapp.com/v2/{path};
 //	* args		- as query variables;
@@ -147,12 +153,5 @@ func (a *API) Post(path string, args Arguments, body interface{}, target interfa
 //	* target	- interface response should be placed to;
 //  ** - auth headers are included.
 func (a *API) Patch(path string, args Arguments, body interface{}, target interface{}) error {
-	req := a.createRequest("PATCH", path, args, body)
-
-	responseBody, err := a.doRequest(req)
-	if err != nil {
-		return err
-	}
-
-	return a.decodeBody(responseBody, target)
+	return a.ppp("PATCH", path, args, body, target)
 }
