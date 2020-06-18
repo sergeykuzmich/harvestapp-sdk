@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/pkg/errors"
-	httpErrors "github.com/sergeykuzmich/harvestapp-sdk/http_errors"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/pkg/errors"
+
+	httpErrors "github.com/sergeykuzmich/harvestapp-sdk/http_errors"
 )
 
 const clientVersion = "1.0.0"
