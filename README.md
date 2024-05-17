@@ -1,6 +1,7 @@
-# Harvest API (version 2) Golang SDK
+# Harvest API V2 / Golang SDK
 
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/sergeykuzmich/harvestapp-sdk/Quality%20Assurance?label=tests)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/sergeykuzmich/harvestapp-sdk/tests.yml?branch=master&label=qa
+)
 ![Code Climate maintainability](https://img.shields.io/codeclimate/maintainability/sergeykuzmich/harvestapp-sdk)
 ![Code Climate coverage](https://img.shields.io/codeclimate/coverage/sergeykuzmich/harvestapp-sdk)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/sergeykuzmich/harvestapp-sdk)
