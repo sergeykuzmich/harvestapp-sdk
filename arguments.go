@@ -3,8 +3,6 @@ package hrvst
 import (
 	"net/url"
 	"strings"
-
-	"github.com/sergeykuzmich/harvestapp-sdk/flags"
 )
 
 // Arguments [`key`=>`value`] dictionary should be passed as a GET query string
