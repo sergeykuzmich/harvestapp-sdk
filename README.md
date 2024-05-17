@@ -1,4 +1,4 @@
-# Harvest API (version 2) Golang SDK
+# Harvest API V2 / Golang SDK
 
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/sergeykuzmich/harvestapp-sdk/tests.yml?branch=master&label=qa
 )
