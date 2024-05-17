@@ -9,3 +9,9 @@
 ![GitHub contributors](https://img.shields.io/github/contributors/sergeykuzmich/harvestapp-sdk)
 
 Go Package Docs: [pkg.go.dev/github.com/sergeykuzmich/harvestapp-sdk](https://pkg.go.dev/github.com/sergeykuzmich/harvestapp-sdk)
+
+## Commands
+
+* `make fmt` - format files 
+* `make test` - execute tests
+* `make coverage` - view tests coverage
