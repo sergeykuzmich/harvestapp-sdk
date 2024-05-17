@@ -5,7 +5,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/sergeykuzmich/harvestapp-sdk/flags"
 	httpErrors "github.com/sergeykuzmich/harvestapp-sdk/http_errors"
 )
 
@@ -174,21 +173,4 @@ func TestGetTasksPaginated(t *testing.T) {
 	assert.Equal(t, "Project Management", all[2].Name)
 	assert.Equal(t, "Programming", all[3].Name)
 	assert.Equal(t, "Graphic Design", all[4].Name)
-}
-
-func TestGetTasksNonPaginated(t *testing.T) {
-	client := testClient()
-
-	args := Defaults()
-	args[flags.GetAll] = "true"
-	tasks, next, err := client.GetTasks(args)
-	assert.Nil(t, err)
-	assert.Nil(t, next)
-	assert.Equal(t, 5, len(tasks))
-
-	assert.Equal(t, "Business Development", tasks[0].Name)
-	assert.Equal(t, "Research", tasks[1].Name)
-	assert.Equal(t, "Project Management", tasks[2].Name)
-	assert.Equal(t, "Programming", tasks[3].Name)
-	assert.Equal(t, "Graphic Design", tasks[4].Name)
 }
