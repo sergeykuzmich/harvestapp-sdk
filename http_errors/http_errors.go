@@ -12,7 +12,7 @@ type HTTPError interface {
 	Path() string
 }
 
-type HTTPErrorCallback func(string, []byte) HTTPError
+type httpErrorCallback func(string, []byte) HTTPError
 
 // CreateFromResponse converts http.Response with non 2** status code
 // to Error with HTTPError interface.
@@ -24,7 +24,7 @@ func CreateFromResponse(response *http.Response) HTTPError {
 
 	path := response.Request.URL.Path
 
-	errorsMap := map[int]HTTPErrorCallback{
+	errorsMap := map[int]httpErrorCallback{
 		401: createUnauthorized,
 		403: createForbidden,
 		404: createNotFound,
