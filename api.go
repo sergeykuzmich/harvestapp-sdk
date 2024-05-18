@@ -25,8 +25,8 @@ type API struct {
 }
 
 // Client initializes Harvest API worker with auth credentials:
-//	* Account ID;
-//	* API Token.
+//   - Account ID;
+//   - API Token.
 func Client(accountID string, accessToken string) *API {
 	a := API{}
 	a.client = http.DefaultClient
@@ -40,12 +40,12 @@ func Client(accountID string, accessToken string) *API {
 func (a *API) addHeaders(req *http.Request) {
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
-	req.Header.Set("User-Agent", "github.com/sergeykuzmich/harvest-sdk v"+clientVersion)
+	req.Header.Set("User-Agent", "github.com/sergeykuzmich/harvestapp-sdk v"+clientVersion)
 	req.Header.Set("Harvest-Account-Id", a.AccountID)
 	req.Header.Set("Authorization", "Bearer "+a.AccessToken)
 }
 
-// decodeBody reads respose JSON to provided target interface.
+// decodeBody reads response JSON to provided target interface.
 func (a *API) decodeBody(jsonBody []byte, target interface{}) error {
 	err := json.Unmarshal(jsonBody, target)
 	if err != nil {
@@ -97,10 +97,10 @@ func (a *API) doRequest(req *http.Request) (body []byte, err error) {
 }
 
 // Get performs direct GET request to Harvest API with:
-//	* path		- https://API.harvestapp.com/v2/{path};
-//	* args		- as query variables;
-//	* target	- interface response should be placed to;
-//  ** - auth headers are included.
+//   - path		- https://API.harvestapp.com/v2/{path};
+//   - args		- as query variables;
+//   - target	- interface response should be placed to;
+//     ** - auth headers are included.
 func (a *API) Get(path string, args Arguments, target interface{}) error {
 	req := a.createRequest("GET", path, args, nil)
 
@@ -113,9 +113,9 @@ func (a *API) Get(path string, args Arguments, target interface{}) error {
 }
 
 // Delete performs direct DELETE request to Harvest API with:
-//	* path	- https://API.harvestapp.com/v2/{path};
-//	* args	- as query variables;
-//  ** - auth headers are included.
+//   - path	- https://API.harvestapp.com/v2/{path};
+//   - args	- as query variables;
+//     ** - auth headers are included.
 func (a *API) Delete(path string, args Arguments) error {
 	req := a.createRequest("DELETE", path, args, nil)
 
@@ -137,21 +137,21 @@ func (a *API) ppp(method string, path string, args Arguments, body interface{}, 
 }
 
 // Post performs direct POST request to Harvest API with:
-//	* path		- https://API.harvestapp.com/v2/{path};
-//	* args		- as query variables;
-//	* body		- as body;
-//	* target	- interface response should be placed to;
-//  ** - auth headers are included.
+//   - path		- https://API.harvestapp.com/v2/{path};
+//   - args		- as query variables;
+//   - body		- as body;
+//   - target	- interface response should be placed to;
+//     ** - auth headers are included.
 func (a *API) Post(path string, args Arguments, body interface{}, target interface{}) error {
 	return a.ppp("POST", path, args, body, target)
 }
 
 // Patch performs direct PATCH request to Harvest API with:
-//	* path		- https://API.harvestapp.com/v2/{path};
-//	* args		- as query variables;
-//	* body		- as body;
-//	* target	- interface response should be placed to;
-//  ** - auth headers are included.
+//   - path		- https://API.harvestapp.com/v2/{path};
+//   - args		- as query variables;
+//   - body		- as body;
+//   - target	- interface response should be placed to;
+//     ** - auth headers are included.
 func (a *API) Patch(path string, args Arguments, body interface{}, target interface{}) error {
 	return a.ppp("PATCH", path, args, body, target)
 }

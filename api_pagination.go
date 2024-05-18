@@ -31,7 +31,7 @@ func (a *API) getPaginated(path string, args Arguments, target interface{}) (nex
 		}
 
 		page := &paginationInfo{}
-		err = decodePaignatedBody(responseBody, i, page)
+		err = decodePaginatedBody(responseBody, i, page)
 		if err != nil {
 			return nil, err
 		}
@@ -49,8 +49,8 @@ func (a *API) getPaginated(path string, args Arguments, target interface{}) (nex
 	return nextPage(target)
 }
 
-// decodeBody reads respose JSON to provided target interface & paginationInfo interface.
-func decodePaignatedBody(jsonBody []byte, target interface{}, paginationInfo interface{}) (err error) {
+// decodeBody reads response JSON to provided target interface & paginationInfo interface.
+func decodePaginatedBody(jsonBody []byte, target interface{}, paginationInfo interface{}) (err error) {
 	err = json.Unmarshal(jsonBody, target)
 	if err != nil {
 		return errors.Wrapf(err, "JSON decode failed: `%s`", string(jsonBody))

@@ -25,7 +25,7 @@ func TestCreateServerError(t *testing.T) {
 	assert.Equal(t, err.Error(), errorMessage)
 }
 
-func TestCreateFromServerErrordResponse(t *testing.T) {
+func TestCreateFromServerErroredResponse(t *testing.T) {
 	status := 500
 	path := "/500"
 	body := "Internal Server Error"
