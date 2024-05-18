@@ -7,7 +7,7 @@ import (
 )
 
 func TestHrvstClientArguments(t *testing.T) {
-	AccountID := "ACCOUNTID"
+	AccountID := "ACCOUNT-ID"
 	AccessToken := "TOKEN"
 
 	client := Client(AccountID, AccessToken)

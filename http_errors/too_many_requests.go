@@ -23,7 +23,7 @@ func (e *TooManyRequests) Path() string {
 	return e.path
 }
 
-func createTooManyRequests(path string, body []byte) *TooManyRequests {
+func createTooManyRequests(path string, body []byte) HTTPError {
 	return &TooManyRequests{
 		path: path,
 		body: body,

@@ -22,7 +22,7 @@ func (e *NotFound) Path() string {
 	return e.path
 }
 
-func createNotFound(path string, body []byte) *NotFound {
+func createNotFound(path string, body []byte) HTTPError {
 	return &NotFound{
 		path: path,
 		body: body,

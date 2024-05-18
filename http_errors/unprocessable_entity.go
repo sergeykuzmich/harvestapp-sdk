@@ -22,7 +22,7 @@ func (e *UnprocessableEntity) Path() string {
 	return e.path
 }
 
-func createUnprocessableEntity(path string, body []byte) *UnprocessableEntity {
+func createUnprocessableEntity(path string, body []byte) HTTPError {
 	return &UnprocessableEntity{
 		path: path,
 		body: body,

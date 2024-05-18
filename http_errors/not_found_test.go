@@ -2,6 +2,7 @@ package errors
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -15,12 +16,16 @@ func TestCreateNotFoundError(t *testing.T) {
 	errorMessage := fmt.Sprintf("Not Found: %s", path)
 	var body []byte
 
-	var err *NotFound
+	var err HTTPError
 	err = createNotFound(path, body)
 
-	assert.Equal(t, err.Path(), path)
-	assert.Equal(t, err.Details(), body)
-	assert.Equal(t, err.Error(), errorMessage)
+	var asNotFound *NotFound
+	ok := errors.As(err, &asNotFound)
+	assert.True(t, ok)
+
+	assert.Equal(t, asNotFound.Path(), path)
+	assert.Equal(t, asNotFound.Details(), body)
+	assert.Equal(t, asNotFound.Error(), errorMessage)
 }
 
 func TestCreateFromNotFoundResponse(t *testing.T) {
@@ -37,7 +42,8 @@ func TestCreateFromNotFoundResponse(t *testing.T) {
 
 	err := CreateFromResponse(res)
 
-	asNotFound, ok := err.(*NotFound)
+	var asNotFound *NotFound
+	ok := errors.As(err, &asNotFound)
 	assert.True(t, ok)
 
 	assert.Equal(t, asNotFound.Path(), path)

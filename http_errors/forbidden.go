@@ -2,7 +2,7 @@ package errors
 
 import "fmt"
 
-// Forbidden is returned on when client can't get a resource.
+// Forbidden is returned on when client not allowed to get a resource.
 type Forbidden struct {
 	path string
 	body []byte
@@ -22,7 +22,7 @@ func (e *Forbidden) Path() string {
 	return e.path
 }
 
-func createForbidden(path string, body []byte) *Forbidden {
+func createForbidden(path string, body []byte) HTTPError {
 	return &Forbidden{
 		path: path,
 		body: body,

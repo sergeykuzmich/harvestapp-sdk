@@ -12,7 +12,7 @@ import (
 )
 
 func testClient() *API {
-	a := Client("ACCOUNTID", "TOKEN")
+	a := Client("ACCOUNT-ID", "TOKEN")
 	a.apiURL = mockDynamicResponse().URL
 	return a
 }

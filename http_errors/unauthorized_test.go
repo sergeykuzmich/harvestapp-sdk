@@ -2,6 +2,7 @@ package errors
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -15,12 +16,16 @@ func TestCreateUnauthorizedError(t *testing.T) {
 	errorMessage := fmt.Sprintf("Unauthorized: %s", path)
 	var body []byte
 
-	var err *Unauthorized
+	var err HTTPError
 	err = createUnauthorized(path, body)
 
-	assert.Equal(t, err.Path(), path)
-	assert.Equal(t, err.Details(), body)
-	assert.Equal(t, err.Error(), errorMessage)
+	var asUnauthorized *Unauthorized
+	ok := errors.As(err, &asUnauthorized)
+	assert.True(t, ok)
+
+	assert.Equal(t, asUnauthorized.Path(), path)
+	assert.Equal(t, asUnauthorized.Details(), body)
+	assert.Equal(t, asUnauthorized.Error(), errorMessage)
 }
 
 func TestCreateFromUnauthorizedResponse(t *testing.T) {
@@ -39,7 +44,8 @@ func TestCreateFromUnauthorizedResponse(t *testing.T) {
 
 	err := CreateFromResponse(res)
 
-	asUnauthorized, ok := err.(*Unauthorized)
+	var asUnauthorized *Unauthorized
+	ok := errors.As(err, &asUnauthorized)
 	assert.True(t, ok)
 
 	assert.Equal(t, asUnauthorized.Path(), path)
