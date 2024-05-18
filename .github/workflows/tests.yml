@@ -10,7 +10,7 @@ on:
 
 jobs:
   job_tests:
-    name: Run `go test`
+    name: go test
     runs-on: ubuntu-latest
 
     strategy:
