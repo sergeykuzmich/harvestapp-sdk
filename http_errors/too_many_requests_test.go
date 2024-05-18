@@ -2,6 +2,7 @@ package errors
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -15,12 +16,16 @@ func TestCreateTooManyRequestsError(t *testing.T) {
 	errorMessage := fmt.Sprintf("Too Many Requests: %s", path)
 	var body []byte
 
-	var err *TooManyRequests
+	var err HTTPError
 	err = createTooManyRequests(path, body)
 
-	assert.Equal(t, err.Path(), path)
-	assert.Equal(t, err.Details(), body)
-	assert.Equal(t, err.Error(), errorMessage)
+	var asTooManyRequests *TooManyRequests
+	ok := errors.As(err, &asTooManyRequests)
+	assert.True(t, ok)
+
+	assert.Equal(t, asTooManyRequests.Path(), path)
+	assert.Equal(t, asTooManyRequests.Details(), body)
+	assert.Equal(t, asTooManyRequests.Error(), errorMessage)
 }
 
 func TestCreateFromTooManyRequestsResponse(t *testing.T) {
@@ -37,7 +42,8 @@ func TestCreateFromTooManyRequestsResponse(t *testing.T) {
 
 	err := CreateFromResponse(res)
 
-	asTooManyRequests, ok := err.(*TooManyRequests)
+	var asTooManyRequests *TooManyRequests
+	ok := errors.As(err, &asTooManyRequests)
 	assert.True(t, ok)
 
 	assert.Equal(t, asTooManyRequests.Path(), path)

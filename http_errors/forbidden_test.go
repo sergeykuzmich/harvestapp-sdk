@@ -2,6 +2,7 @@ package errors
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -15,12 +16,16 @@ func TestCreateForbiddenError(t *testing.T) {
 	errorMessage := fmt.Sprintf("Forbidden: %s", path)
 	var body []byte
 
-	var err *Forbidden
+	var err HTTPError
 	err = createForbidden(path, body)
 
-	assert.Equal(t, err.Path(), path)
-	assert.Equal(t, err.Details(), body)
-	assert.Equal(t, err.Error(), errorMessage)
+	var asForbidden *Forbidden
+	ok := errors.As(err, &asForbidden)
+	assert.True(t, ok)
+
+	assert.Equal(t, asForbidden.Path(), path)
+	assert.Equal(t, asForbidden.Details(), body)
+	assert.Equal(t, asForbidden.Error(), errorMessage)
 }
 
 func TestCreateFromForbiddenResponse(t *testing.T) {
@@ -39,7 +44,8 @@ func TestCreateFromForbiddenResponse(t *testing.T) {
 
 	err := CreateFromResponse(res)
 
-	asForbidden, ok := err.(*Forbidden)
+	var asForbidden *Forbidden
+	ok := errors.As(err, &asForbidden)
 	assert.True(t, ok)
 
 	assert.Equal(t, asForbidden.Path(), path)

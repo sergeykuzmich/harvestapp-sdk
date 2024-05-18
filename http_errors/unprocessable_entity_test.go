@@ -3,6 +3,7 @@ package errors
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -18,12 +19,16 @@ func TestCreateUnprocessableEntityError(t *testing.T) {
 	}`
 	errorMessage := fmt.Sprintf("Unprocessable Entity: %s %s", path, []byte(body))
 
-	var err *UnprocessableEntity
+	var err HTTPError
 	err = createUnprocessableEntity(path, []byte(body))
 
-	assert.Equal(t, err.Path(), path)
-	assert.Equal(t, err.Details(), []byte(body))
-	assert.Equal(t, err.Error(), errorMessage)
+	var asUnprocessableEntity *UnprocessableEntity
+	ok := errors.As(err, &asUnprocessableEntity)
+	assert.True(t, ok)
+
+	assert.Equal(t, asUnprocessableEntity.Path(), path)
+	assert.Equal(t, asUnprocessableEntity.Details(), []byte(body))
+	assert.Equal(t, asUnprocessableEntity.Error(), errorMessage)
 }
 
 func TestCreateFromUnprocessableEntityResponse(t *testing.T) {
@@ -36,7 +41,7 @@ func TestCreateFromUnprocessableEntityResponse(t *testing.T) {
 	}`
 
 	buffer := new(bytes.Buffer)
-	json.NewEncoder(buffer).Encode(reqBody)
+	_ = json.NewEncoder(buffer).Encode(reqBody)
 
 	req, _ := http.NewRequest("POST", path, buffer)
 
@@ -51,7 +56,8 @@ func TestCreateFromUnprocessableEntityResponse(t *testing.T) {
 
 	err := CreateFromResponse(res)
 
-	asUnprocessableEntity, ok := err.(*UnprocessableEntity)
+	var asUnprocessableEntity *UnprocessableEntity
+	ok := errors.As(err, &asUnprocessableEntity)
 	assert.True(t, ok)
 
 	assert.Equal(t, asUnprocessableEntity.Path(), path)

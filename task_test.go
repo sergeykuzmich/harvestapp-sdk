@@ -1,6 +1,7 @@
 package hrvst
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -26,18 +27,19 @@ func TestGetNonExistingTask(t *testing.T) {
 	assert.NotNil(t, err)
 
 	// Since SDK uses own errors check correct type is returned
-	_, ok := err.(*httpErrors.NotFound)
+	var notFound *httpErrors.NotFound
+	ok := errors.As(err, &notFound)
 	assert.True(t, ok)
 }
 
 func TestCreateTask(t *testing.T) {
 	client := testClient()
 
-	valid_task := &Task{
+	validTask := &Task{
 		Name: "New Task Name",
 	}
 
-	task, err := client.CreateTask(valid_task, Defaults())
+	task, err := client.CreateTask(validTask, Defaults())
 	assert.Nil(t, err)
 
 	assert.NotNil(t, task)
@@ -48,18 +50,19 @@ func TestCreateTask(t *testing.T) {
 func TestCreateInvalidTask(t *testing.T) {
 	client := testClient()
 
-	invalid_task := &Task{
+	invalidTask := &Task{
 		DefaultHourlyRate: 120.0,
 	}
 
 	args := Arguments{}
 	args["status"] = "422"
 
-	_, err := client.CreateTask(invalid_task, args)
+	_, err := client.CreateTask(invalidTask, args)
 	assert.NotNil(t, err)
 
 	// Since SDK uses own errors check correct type is returned
-	_, ok := err.(*httpErrors.UnprocessableEntity)
+	var unprocessableEntity *httpErrors.UnprocessableEntity
+	ok := errors.As(err, &unprocessableEntity)
 	assert.True(t, ok)
 
 	// The way to check error details:
@@ -75,12 +78,12 @@ func TestCreateInvalidTask(t *testing.T) {
 func TestUpdateTaskWithValidInput(t *testing.T) {
 	client := testClient()
 
-	valid_task := &Task{
+	validTask := &Task{
 		ID:                8083782,
 		DefaultHourlyRate: 120.0,
 	}
 
-	task, err := client.UpdateTask(valid_task, Defaults())
+	task, err := client.UpdateTask(validTask, Defaults())
 	assert.Nil(t, err)
 
 	assert.NotNil(t, task)
@@ -91,7 +94,7 @@ func TestUpdateTaskWithValidInput(t *testing.T) {
 func TestUpdateTaskWithInvalidInput(t *testing.T) {
 	client := testClient()
 
-	invalid_task := &Task{
+	invalidTask := &Task{
 		ID:   8083783,
 		Name: "",
 	}
@@ -99,11 +102,12 @@ func TestUpdateTaskWithInvalidInput(t *testing.T) {
 	args := Arguments{}
 	args["status"] = "422"
 
-	_, err := client.UpdateTask(invalid_task, args)
+	_, err := client.UpdateTask(invalidTask, args)
 	assert.NotNil(t, err)
 
 	// Since SDK uses own errors check correct type is returned
-	_, ok := err.(*httpErrors.UnprocessableEntity)
+	var unprocessableEntity *httpErrors.UnprocessableEntity
+	ok := errors.As(err, &unprocessableEntity)
 	assert.True(t, ok)
 }
 
@@ -119,7 +123,8 @@ func TestUpdateNonExistingTask(t *testing.T) {
 	assert.NotNil(t, err)
 
 	// Since SDK uses own errors check correct type is returned
-	_, ok := err.(*httpErrors.NotFound)
+	var notFound *httpErrors.NotFound
+	ok := errors.As(err, &notFound)
 	assert.True(t, ok)
 }
 
@@ -136,7 +141,8 @@ func TestDeleteNonExistingTask(t *testing.T) {
 	err := client.DeleteTask(404, Defaults())
 	assert.NotNil(t, err)
 
-	_, ok := err.(*httpErrors.NotFound)
+	var notFound *httpErrors.NotFound
+	ok := errors.As(err, &notFound)
 	assert.True(t, ok)
 }
 

@@ -2,7 +2,7 @@ package errors
 
 import "fmt"
 
-// Unauthorized is returned in case of ivalid Harvest credentials.
+// Unauthorized is returned in case of invalid Harvest credentials.
 type Unauthorized struct {
 	path string
 	body []byte
@@ -22,7 +22,7 @@ func (e *Unauthorized) Path() string {
 	return e.path
 }
 
-func createUnauthorized(path string, body []byte) *Unauthorized {
+func createUnauthorized(path string, body []byte) HTTPError {
 	return &Unauthorized{
 		path: path,
 		body: body,
