@@ -6,8 +6,6 @@ import (
 	"strconv"
 
 	"github.com/pkg/errors"
-
-	"github.com/sergeykuzmich/harvestapp-sdk/flags"
 )
 
 type paginationInfo struct {
@@ -17,7 +15,6 @@ type paginationInfo struct {
 type paginated func(interface{}) (paginated, error)
 
 // getPaginated performs GET request with generalized pagination
-// * args[flags.GetAll] = "true" - is used to get ALL tasks without breaking to pages
 func (a *API) getPaginated(path string, args Arguments, target interface{}) (nextPage paginated, err error) {
 	targetInstance := reflect.Indirect(reflect.ValueOf(target))
 
@@ -34,7 +31,7 @@ func (a *API) getPaginated(path string, args Arguments, target interface{}) (nex
 		}
 
 		page := &paginationInfo{}
-		err = decodePaignatedBody(responseBody, i, page)
+		err = decodePaginatedBody(responseBody, i, page)
 		if err != nil {
 			return nil, err
 		}
@@ -49,31 +46,11 @@ func (a *API) getPaginated(path string, args Arguments, target interface{}) (nex
 		return nextPage, err
 	}
 
-	if args[flags.GetAll] != "true" {
-		return nextPage(target)
-	}
-
-	data := targetInstance.FieldByName("Data")
-
-	for ok := (nextPage != nil); ok; ok = (nextPage != nil) {
-		targetInstanceCopy := reflect.New(targetInstance.Type())
-
-		nextPage, err = nextPage(targetInstanceCopy.Interface())
-		if err != nil {
-			return nil, err
-		}
-
-		data = reflect.AppendSlice(data, reflect.Indirect(targetInstanceCopy).FieldByName("Data"))
-	}
-
-	targetInstance.FieldByName("Data").Set(data)
-
-	return nil, err
+	return nextPage(target)
 }
 
-
-// decodeBody reads respose JSON to provided target interface & paginationInfo interface.
-func decodePaignatedBody(jsonBody []byte, target interface{}, paginationInfo interface{}) (err error) {
+// decodeBody reads response JSON to provided target interface & paginationInfo interface.
+func decodePaginatedBody(jsonBody []byte, target interface{}, paginationInfo interface{}) (err error) {
 	err = json.Unmarshal(jsonBody, target)
 	if err != nil {
 		return errors.Wrapf(err, "JSON decode failed: `%s`", string(jsonBody))

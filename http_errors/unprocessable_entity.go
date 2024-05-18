@@ -2,7 +2,7 @@ package errors
 
 import "fmt"
 
-// UnprocessableEntity resresents any kind of resource validation errors.
+// UnprocessableEntity represents any kind of resource validation errors.
 type UnprocessableEntity struct {
 	path string
 	body []byte

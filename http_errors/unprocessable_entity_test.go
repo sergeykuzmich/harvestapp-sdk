@@ -28,15 +28,15 @@ func TestCreateUnprocessableEntityError(t *testing.T) {
 
 func TestCreateFromUnprocessableEntityResponse(t *testing.T) {
 	path := "/422"
-	req_body := `{
+	reqBody := `{
 		"default_hourly_rate":120.0
 	}`
-	res_body := `{
+	resBody := `{
 		"message": "Name can't be blank"
 	}`
 
 	buffer := new(bytes.Buffer)
-	json.NewEncoder(buffer).Encode(req_body)
+	json.NewEncoder(buffer).Encode(reqBody)
 
 	req, _ := http.NewRequest("POST", path, buffer)
 
@@ -44,8 +44,8 @@ func TestCreateFromUnprocessableEntityResponse(t *testing.T) {
 		Status:        "422 Unprocessable Entity",
 		StatusCode:    422,
 		Proto:         "HTTP/1.1",
-		Body:          ioutil.NopCloser(bytes.NewBufferString(string(res_body))),
-		ContentLength: int64(len(string(res_body))),
+		Body:          ioutil.NopCloser(bytes.NewBufferString(string(resBody))),
+		ContentLength: int64(len(string(resBody))),
 		Request:       req,
 	}
 
@@ -55,5 +55,5 @@ func TestCreateFromUnprocessableEntityResponse(t *testing.T) {
 	assert.True(t, ok)
 
 	assert.Equal(t, asUnprocessableEntity.Path(), path)
-	assert.Equal(t, asUnprocessableEntity.Details(), []byte(res_body))
+	assert.Equal(t, asUnprocessableEntity.Details(), []byte(resBody))
 }

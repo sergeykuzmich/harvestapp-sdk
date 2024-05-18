@@ -12,8 +12,8 @@ type tasksResponse struct {
 type tasksPaginated func() ([]*Task, tasksPaginated, error)
 
 // Task is a struct to represent Harvest Task, performs:
-//  * `struct` -> `JSON` convertion;
-//  * `JSON` -> `struct` conversion.
+//   - `struct` -> `JSON` conversion;
+//   - `JSON` -> `struct` conversion.
 type Task struct {
 	ID                int       `json:"id"`
 	Name              string    `json:"name"`
